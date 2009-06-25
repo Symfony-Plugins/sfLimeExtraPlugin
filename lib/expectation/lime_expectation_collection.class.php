@@ -91,6 +91,8 @@ abstract class lime_expectation_collection implements lime_verifiable
    */
   protected $failOnVerify = false;
 
+  protected $expectNothing = false;
+
   /**
    * Whether the comparison between expected and actual values should be
    * type-safe.
@@ -132,7 +134,11 @@ abstract class lime_expectation_collection implements lime_verifiable
       throw new BadMethodCallException("A lime_test object is required for verification");
     }
 
-    if ($this->strict)
+    if (count($this->expected) == 0)
+    {
+      $this->test->pass('No values have been expected');
+    }
+    else if ($this->strict)
     {
       $this->test->ok($this->actual === $this->expected, 'The expected values have been set');
     }
@@ -140,6 +146,11 @@ abstract class lime_expectation_collection implements lime_verifiable
     {
       $this->test->ok($this->actual == $this->expected, 'The expected values have been set');
     }
+  }
+
+  public function setExpectNothing()
+  {
+    $this->expectNothing = true;
   }
 
   /**
@@ -159,7 +170,15 @@ abstract class lime_expectation_collection implements lime_verifiable
    */
   public function addActual($value)
   {
+    $ignoreValue = count($this->expected) == 0 && !$this->expectNothing;
+    if (!$this->failOnVerify && !$ignoreValue && !$this->isExpected($value))
+    {
+      throw new lime_expectation_exception('Unexpected value "'.$value.'"');
+    }
+
     $this->actual[] = $value;
   }
+
+  abstract protected function isExpected($value);
 
 }

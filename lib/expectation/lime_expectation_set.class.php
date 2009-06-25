@@ -37,16 +37,11 @@ class lime_expectation_set extends lime_expectation_collection
 
   /**
    * (non-PHPdoc)
-   * @see lib/expectation/lime_expectation_collection#addActual($value)
+   * @see lib/expectation/lime_expectation_collection#isExpected($value)
    */
-  public function addActual($value)
+  protected function isExpected($value)
   {
-    if (!$this->failOnVerify && !in_array($value, $this->expected))
-    {
-      throw new lime_expectation_exception('Unexpected value "'.$value.'"');
-    }
-
-    parent::addActual($value);
+    return in_array($value, $this->expected);
   }
 
   /**

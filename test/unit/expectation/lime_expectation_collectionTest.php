@@ -12,10 +12,26 @@ include dirname(__FILE__).'/../../bootstrap/unit.php';
 include dirname(__FILE__).'/../mock_lime_test.class.php';
 
 
-class TestExpectationCollection extends lime_expectation_collection {}
+class TestExpectationCollection extends lime_expectation_collection
+{
+  private $isExpected;
+
+  public function __construct(lime_test $test = null, $isExpected = true)
+  {
+    parent::__construct($test);
+
+    $this->isExpected = $isExpected;
+  }
+
+  protected function isExpected($value)
+  {
+    return $this->isExpected;;
+  }
+
+}
 
 
-$t = new lime_test(19, new lime_output_color());
+$t = new lime_test(21, new lime_output_color());
 
 
 $t->comment('No value expected, no value retrieved');
@@ -41,18 +57,6 @@ $t->comment('One value expected, no value retrieved');
   $t->is($mockTest->fails, 1, 'One test failed');
 
 
-$t->comment('No value expected, one value retrieved');
-
-  // fixtures
-  $l = new TestExpectationCollection($mockTest = new mock_lime_test());
-  // test
-  $l->addActual(1);
-  $l->verify();
-  // assertions
-  $t->is($mockTest->passes, 0, 'No test passed');
-  $t->is($mockTest->fails, 1, 'One test failed');
-
-
 $t->comment('One value expected, one different value retrieved');
 
   // fixtures
@@ -66,7 +70,53 @@ $t->comment('One value expected, one different value retrieved');
   $t->is($mockTest->fails, 1, 'One test failed');
 
 
-$t->comment('The expected value was retrieved');
+$t->comment('No expectations are set, added values are ignored');
+
+  // fixtures
+  $l = new TestExpectationCollection($mockTest = new mock_lime_test());
+  // test
+  $l->addActual(1);
+  $l->verify();
+  // assertions
+  $t->is($mockTest->passes, 1, 'One test passed');
+  $t->is($mockTest->fails, 0, 'No test failed');
+
+
+$t->comment('An exception is thrown if an unexpected value is added');
+
+  // fixtures
+  $l = new TestExpectationCollection(new mock_lime_test(), false);
+  // test
+  $l->addExpected('Foo');
+  try
+  {
+    $l->addActual('Bar');
+    $t->fail('A "lime_expectation_exception" is thrown');
+  }
+  catch (lime_expectation_exception $e)
+  {
+    $t->pass('A "lime_expectation_exception" is thrown');
+  }
+
+
+$t->comment('Exactly no values are expected');
+
+  // fixtures
+  $l = new TestExpectationCollection(new mock_lime_test(), false);
+  // test
+  $l->setExpectNothing();
+  try
+  {
+    $l->addActual('Bar');
+    $t->fail('A "lime_expectation_exception" is thrown');
+  }
+  catch (lime_expectation_exception $e)
+  {
+    $t->pass('A "lime_expectation_exception" is thrown');
+  }
+
+
+$t->comment('The expected value was added');
 
   // fixtures
   $l = new TestExpectationCollection($mockTest = new mock_lime_test());

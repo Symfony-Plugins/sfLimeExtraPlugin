@@ -45,22 +45,14 @@ class lime_expectation_bag extends lime_expectation_collection
 
   /**
    * (non-PHPdoc)
-   * @see lib/expectation/lime_expectation_collection#addActual($value)
+   * @see lib/expectation/lime_expectation_collection#isExpected($value)
    */
-  public function addActual($value)
+  protected function isExpected($value)
   {
-    if (!$this->failOnVerify)
-    {
       $actual = $this->count($value, $this->actual);
       $expected = $this->count($value, $this->expected);
 
-      if ($expected == 0 || $actual >= $expected)
-      {
-        throw new lime_expectation_exception('Unexpected value "'.$value.'"');
-      }
-    }
-
-    parent::addActual($value);
+      return $actual < $expected;
   }
 
   /**
