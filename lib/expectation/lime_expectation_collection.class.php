@@ -26,7 +26,39 @@
  * retrieved. You do this by calling setFailOnVerify().
  *
  * In your application you must use one of the concrete subclasses to make
- * use of this functionality.
+ * use of this functionality. The differences between the subclasses are
+ * how they take the order and amount of items into account.
+ *
+ * Classes that take the order into account expect the value to be added in
+ * the exact same order as they were expected. Classes that respect the
+ * amount require the value to be added the same number of times as it was
+ * expected.
+ *
+ * The following table lists how the different subclasses treat these
+ * properties:
+ *
+ * <table>
+ *  <tr>
+ *    <th>Class</th>
+ *    <th>Amount</th>
+ *    <th>Order</th>
+ *  </tr>
+ *  <tr>
+ *    <td>lime_expectation_list</td>
+ *    <td>Yes</td>
+ *    <td>Yes</td>
+ *  </tr>
+ *  <tr>
+ *    <td>lime_expectation_set</td>
+ *    <td>No</td>
+ *    <td>No</td>
+ *  </tr>
+ *  <tr>
+ *    <td>lime_expectation_bag</td>
+ *    <td>Yes</td>
+ *    <td>No</td>
+ *  </tr>
+ * </table>
  *
  * @package    sfLimeExtraPlugin
  * @author     Bernhard Schussek <bschussek@gmail.com>
