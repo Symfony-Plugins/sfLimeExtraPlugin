@@ -286,7 +286,7 @@ class lime_mock
    * Configures the mock to throw an exception when an unexpected method call
    * is made.
    *
-   * @param  $mock                       The mock bject
+   * @param  $mock                       The mock object
    * @throws lime_expectation_exception  When an unexpected method is called
    */
   public static function setFailOnVerify($mock)
@@ -300,6 +300,16 @@ class lime_mock
   public static function setExpectNothing()
   {
     return $mock->__lime_getControl()->setExpectNothing();
+  }
+
+  /**
+   * Verifies the given mock.
+   *
+   * @param $mock  The mock object
+   */
+  public static function verify($mock)
+  {
+    return $mock->__lime_getControl()->verify();
   }
 
 }
