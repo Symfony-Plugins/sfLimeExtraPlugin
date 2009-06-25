@@ -87,7 +87,7 @@ class will heavily affect the speed of your tests. Thus the option is to replace
       
       public function read($name)
       {
-        return $name == $this->name ? $value : null;
+        return $name == $this->name ? $this->value : null;
       }
     
       public function write($name, $value) {}
@@ -236,6 +236,7 @@ can suppress this behaviour though by calling ``setFailOnVerify()``, so that
 your code will only be validated when ``verify()`` is called.
 
     [php]
+    $mock->setFailOnVerify();
     $mock->doSomething()->times(2);
     $mock->replay();
     
@@ -261,6 +262,7 @@ called:
 
     [php]
     $mock->setExpectNothing();
+    $mock->replay();
     $mock->doSomething(); // throws a lime_expectation_exception
     
     
