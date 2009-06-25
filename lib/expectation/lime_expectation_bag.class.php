@@ -49,7 +49,7 @@ class lime_expectation_bag extends lime_expectation_collection
    */
   public function addActual($value)
   {
-    if ($this->failOnVerify)
+    if (!$this->failOnVerify)
     {
       $actual = $this->count($value, $this->actual);
       $expected = $this->count($value, $this->expected);

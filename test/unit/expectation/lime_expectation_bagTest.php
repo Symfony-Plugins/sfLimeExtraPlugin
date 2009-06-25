@@ -12,7 +12,7 @@ include dirname(__FILE__).'/../../bootstrap/unit.php';
 include dirname(__FILE__).'/../mock_lime_test.class.php';
 
 
-$t = new lime_test(5, new lime_output_color());
+$t = new lime_test(6, new lime_output_color());
 
 
 $t->comment('Expected values can be added in any order');
@@ -32,31 +32,11 @@ $t->comment('Expected values can be added in any order');
   $t->is($mockTest->fails, 0, 'No test failed');
 
 
-$t->comment('->setFailOnVerify() results in no exceptions if the order is incorrect');
+$t->comment('Exceptions are thrown if unexpected values are added');
 
   // fixtures
   $b = new lime_expectation_bag(new mock_lime_test());
   // test
-  $b->setFailOnVerify();
-  $b->addExpected(1);
-  $b->addExpected(2);
-  try
-  {
-    $b->addActual(2);
-    $t->pass('No "lime_expectation_exception" is thrown');
-  }
-  catch (lime_expectation_exception $e)
-  {
-    $t->fail('No "lime_expectation_exception" is thrown');
-  }
-
-
-$t->comment('->setFailOnVerify() results in exceptions if unexpected values are added');
-
-  // fixtures
-  $b = new lime_expectation_bag(new mock_lime_test());
-  // test
-  $b->setFailOnVerify();
   $b->addExpected(1);
   try
   {
@@ -69,12 +49,11 @@ $t->comment('->setFailOnVerify() results in exceptions if unexpected values are 
   }
 
 
-$t->comment('->setFailOnVerify() results in exceptions if expected values are added too often');
+$t->comment('Exceptions are thrown if expected values are added too often');
 
   // fixtures
   $b = new lime_expectation_bag(new mock_lime_test());
   // test
-  $b->setFailOnVerify();
   $b->addExpected(1);
   $b->addActual(1);
   try
@@ -86,4 +65,19 @@ $t->comment('->setFailOnVerify() results in exceptions if expected values are ad
   {
     $t->pass('A "lime_expectation_exception" is thrown');
   }
+
+
+$t->comment('setFailOnVerify() suppresses exceptions');
+
+  // fixtures
+  $b = new lime_expectation_bag($mockTest = new mock_lime_test());
+  // test
+  $b->setFailOnVerify();
+  $b->addExpected(1);
+  $b->addActual(1);
+  $b->addActual(1);
+  $b->verify();
+  // assertions
+  $t->is($mockTest->passes, 0, 'No test passed');
+  $t->is($mockTest->fails, 1, 'One test failed');
 

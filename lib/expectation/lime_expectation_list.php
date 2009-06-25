@@ -55,7 +55,7 @@ class lime_expectation_list extends lime_expectation_collection
    */
   public function addActual($value)
   {
-    if ($this->failOnVerify && $this->expected[$this->cursor] != $value)
+    if (!$this->failOnVerify && $this->expected[$this->cursor] != $value)
     {
       throw new lime_expectation_exception('Unexpected value "'.$value.'"');
     }

@@ -15,7 +15,7 @@ include dirname(__FILE__).'/../mock_lime_test.class.php';
 class TestExpectationCollection extends lime_expectation_collection {}
 
 
-$t = new lime_test(20, new lime_output_color());
+$t = new lime_test(19, new lime_output_color());
 
 
 $t->comment('No value expected, no value retrieved');
@@ -135,22 +135,6 @@ $t->comment('If you call setStrict(), values are compared with strict typing - s
   // assertions
   $t->is($mockTest->passes, 1, 'One test passed');
   $t->is($mockTest->fails, 0, 'No test failed');
-
-
-$t->comment('Calling setFailOnVerify() results in an exception if no test is set');
-
-  // fixtures
-  $l = new TestExpectationCollection();
-  // test
-  try
-  {
-    $l->setFailOnVerify();
-    $t->fail('A "BadMethodCallException" is thrown');
-  }
-  catch (BadMethodCallException $e)
-  {
-    $t->pass('A "BadMethodCallException" is thrown');
-  }
 
 
 $t->comment('Calling verify() results in an exception if no test is set');

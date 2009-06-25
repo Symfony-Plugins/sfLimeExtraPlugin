@@ -12,7 +12,7 @@ include dirname(__FILE__).'/../../bootstrap/unit.php';
 include dirname(__FILE__).'/../mock_lime_test.class.php';
 
 
-$t = new lime_test(6, new lime_output_color());
+$t = new lime_test(7, new lime_output_color());
 
 
 $t->comment('Expected values can be added in any order');
@@ -46,12 +46,11 @@ $t->comment('Expected values can be added any number of times');
   $t->is($mockTest->fails, 0, 'No test failed');
 
 
-$t->comment('->setFailOnVerify() results in exceptions if unexpected values are added');
+$t->comment('Exceptions are thrown if unexpected values are added');
 
   // fixtures
   $s = new lime_expectation_set(new mock_lime_test());
   // test
-  $s->setFailOnVerify();
   $s->addExpected(1);
   try
   {
@@ -64,21 +63,17 @@ $t->comment('->setFailOnVerify() results in exceptions if unexpected values are 
   }
 
 
-$t->comment('->setFailOnVerify() results in no exceptions if the order is incorrect');
+$t->comment('setFailOnVerify() suppresses exceptions');
 
   // fixtures
-  $s = new lime_expectation_set(new mock_lime_test());
+  $b = new lime_expectation_set($mockTest = new mock_lime_test());
   // test
-  $s->setFailOnVerify();
-  $s->addExpected(1);
-  $s->addExpected(2);
-  try
-  {
-    $s->addActual(2);
-    $t->pass('No "lime_expectation_exception" is thrown');
-  }
-  catch (lime_expectation_exception $e)
-  {
-    $t->fail('No "lime_expectation_exception" is thrown');
-  }
+  $b->setFailOnVerify();
+  $b->addExpected(1);
+  $b->addActual(2);
+  $b->verify();
+  // assertions
+  $t->is($mockTest->passes, 0, 'No test passed');
+  $t->is($mockTest->fails, 1, 'One test failed');
+
 

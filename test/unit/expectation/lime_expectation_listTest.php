@@ -15,27 +15,11 @@ include dirname(__FILE__).'/../mock_lime_test.class.php';
 $t = new lime_test(4, new lime_output_color());
 
 
-$t->comment('Expected values need to be retrieved in the same order');
-
-  // fixtures
-  $l = new lime_expectation_list($mockTest = new mock_lime_test());
-  // test
-  $l->addExpected(1);
-  $l->addExpected(2);
-  $l->addActual(2);
-  $l->addActual(1);
-  $l->verify();
-  // assertions
-  $t->is($mockTest->passes, 0, 'No test passed');
-  $t->is($mockTest->fails, 1, 'One test failed');
-
-
-$t->comment('->setFailOnVerify() results in exceptions if unexpected values are added');
+$t->comment('Exceptions are thrown if unexpected values are added');
 
   // fixtures
   $l = new lime_expectation_list(new mock_lime_test());
   // test
-  $l->setFailOnVerify();
   $l->addExpected(1);
   $l->addExpected(2);
   try
@@ -49,12 +33,11 @@ $t->comment('->setFailOnVerify() results in exceptions if unexpected values are 
   }
 
 
-$t->comment('->setFailOnVerify() results in exceptions if expected values are added too often');
+$t->comment('Exceptions are thrown if expected values are added too often');
 
   // fixtures
   $l = new lime_expectation_list(new mock_lime_test());
   // test
-  $l->setFailOnVerify();
   $l->addExpected(1);
   $l->addActual(1);
   try
@@ -66,3 +49,18 @@ $t->comment('->setFailOnVerify() results in exceptions if expected values are ad
   {
     $t->pass('A "lime_expectation_exception" is thrown');
   }
+
+
+$t->comment('setFailOnVerify() suppresses exceptions');
+
+  // fixtures
+  $b = new lime_expectation_list($mockTest = new mock_lime_test());
+  // test
+  $b->setFailOnVerify();
+  $b->addExpected(1);
+  $b->addActual(1);
+  $b->addActual(1);
+  $b->verify();
+  // assertions
+  $t->is($mockTest->passes, 0, 'No test passed');
+  $t->is($mockTest->fails, 1, 'One test failed');

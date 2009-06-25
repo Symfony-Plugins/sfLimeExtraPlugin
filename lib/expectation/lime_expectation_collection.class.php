@@ -20,10 +20,10 @@
  * By default, this class compares the expected and actual values type
  * insensitive. You can change this behaviour by calling setStrict().
  *
- * Usually you only find out whether any expectations have not been met once
- * you call verify(). For the sake of easier debugging, you can enable this
- * class to throw an exception immediately when an unexpected value is
- * retrieved. You do this by calling setFailOnVerify().
+ * Usually, an exception is thrown as soon as you call addActual() with an
+ * unexpected value. This helps to analyze the problem very quickly. If you
+ * want to suppress exceptions and instead receive a failing test once
+ * verify() is called, you can call setFailOnVerify().
  *
  * In your application you must use one of the concrete subclasses to make
  * use of this functionality. The differences between the subclasses are
@@ -109,11 +109,6 @@ abstract class lime_expectation_collection implements lime_verifiable
    */
   public function setFailOnVerify()
   {
-    if (is_null($this->test))
-    {
-      throw new BadMethodCallException("A lime_test object is required for verification");
-    }
-
     $this->failOnVerify = true;
   }
 
