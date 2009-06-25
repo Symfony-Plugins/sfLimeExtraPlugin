@@ -38,7 +38,7 @@ class TestException extends Exception {}
 $t = new lime_test(46, new lime_output_color());
 
 
-$t->comment('::create() creates a new mock object for an interface');
+$t->comment('Interfaces can be mocked');
 
   // test
   $m = lime_mock::create('TestInterface');
@@ -47,7 +47,7 @@ $t->comment('::create() creates a new mock object for an interface');
   $t->ok($m instanceof lime_mock_interface, 'The mock implements "lime_mock_interface"');
 
 
-$t->comment('::create() creates a new mock object for an abstract class');
+$t->comment('Abstract classes can be mocked');
 
   // test
   $m = lime_mock::create('TestClassAbstract');
@@ -56,7 +56,7 @@ $t->comment('::create() creates a new mock object for an abstract class');
   $t->ok($m instanceof lime_mock_interface, 'The mock implements "lime_mock_interface"');
 
 
-$t->comment('::create() creates a new mock object for a non-existing class');
+$t->comment('Non-existing classes can be mocked');
 
   $m = lime_mock::create('FoobarClass');
   // assertions
@@ -64,7 +64,7 @@ $t->comment('::create() creates a new mock object for a non-existing class');
   $t->ok($m instanceof lime_mock_interface, 'The mock implements "lime_mock_interface"');
 
 
-$t->comment('Calling methods on the mock does not call methods in the original class');
+$t->comment('Methods in the mocked class are not called');
 
   // fixtures
   TestClass::$calls = 0;
@@ -75,7 +75,7 @@ $t->comment('Calling methods on the mock does not call methods in the original c
   $t->is(TestClass::$calls, 0, 'The method has not been called');
 
 
-$t->comment('->returns() configures a custom return value for a method');
+$t->comment('Return values can be stubbed');
 
   // fixtures
   $m = lime_mock::create('TestClass');
@@ -87,7 +87,7 @@ $t->comment('->returns() configures a custom return value for a method');
   $t->is($value, 'Foobar', 'The correct value has been returned');
 
 
-$t->comment('->returns() can configure different return values for different parameters');
+$t->comment('Return values can be stubbed based on method parameters');
 
   // fixtures
   $m = lime_mock::create('TestClass');
@@ -102,7 +102,7 @@ $t->comment('->returns() can configure different return values for different par
   $t->is($value2, 'More foobar', 'The correct value has been returned');
 
 
-$t->comment('Custom exceptions can be configured using the class name');
+$t->comment('Exceptions can be stubbed');
 
   // fixtures
   $m = lime_mock::create('TestClass');
@@ -136,7 +136,7 @@ $t->comment('->verify() throws an exception if the mock has been created without
   }
 
 
-$t->comment('->verify() results in a failed test if a method was not called');
+$t->comment('->verify() fails if a method was not called');
 
   // fixtures
   $m = lime_mock::create('TestClass', $mockTest = new mock_lime_test());
@@ -149,7 +149,7 @@ $t->comment('->verify() results in a failed test if a method was not called');
   $t->is($mockTest->passes, 0, 'No test passed');
 
 
-$t->comment('->verify() results in a failed test if a method was not called with different');
+$t->comment('->verify() fails if a method was called with wrong parameters');
 
   // fixtures
   $m = lime_mock::create('TestClass', $mockTest = new mock_lime_test());
@@ -163,7 +163,7 @@ $t->comment('->verify() results in a failed test if a method was not called with
   $t->is($mockTest->passes, 0, 'No test passed');
 
 
-$t->comment('->verify() results in a failed test if a method was called with different parameter order');
+$t->comment('->verify() fails if a method was called with the right parameters in a wrong order');
 
   // fixtures
   $m = lime_mock::create('TestClass', $mockTest = new mock_lime_test());
@@ -177,7 +177,7 @@ $t->comment('->verify() results in a failed test if a method was called with dif
   $t->is($mockTest->passes, 0, 'No test passed');
 
 
-$t->comment('->verify() results in a succeeding test if one method was called correctly');
+$t->comment('->verify() passes if a method was called correctly');
 
   // fixtures
   $m = lime_mock::create('TestClass', $mockTest = new mock_lime_test());
@@ -191,7 +191,7 @@ $t->comment('->verify() results in a succeeding test if one method was called co
   $t->is($mockTest->fails, 0, 'No test failed');
 
 
-$t->comment('->verify() results in a succeeding test if two methods were called correctly');
+$t->comment('->verify() passes if two methods were called correctly');
 
   // fixtures
   $m = lime_mock::create('TestClass', $mockTest = new mock_lime_test());
@@ -207,7 +207,9 @@ $t->comment('->verify() results in a succeeding test if two methods were called 
   $t->is($mockTest->fails, 0, 'No test failed');
 
 
-$t->comment('A method can be expected twice with different parameters - insufficient calls');
+$t->comment('A method can be expected twice with different parameters');
+
+  $t->comment('Case 1: Insufficient method calls');
 
   // fixtures
   $m = lime_mock::create('TestClass', $mockTest = new mock_lime_test());
@@ -222,7 +224,7 @@ $t->comment('A method can be expected twice with different parameters - insuffic
   $t->is($mockTest->fails, 1, 'One test failed');
 
 
-$t->comment('A method can be expected twice with different parameters - sufficient calls');
+  $t->comment('Case 2: Sufficient method calls');
 
   // fixtures
   $m = lime_mock::create('TestClass', $mockTest = new mock_lime_test());
@@ -254,7 +256,7 @@ $t->comment('Methods may be called in any order');
   $t->is($mockTest->fails, 0, 'No test failed');
 
 
-$t->comment('If you call setFailOnVerify(), an exception is thrown at the first unexpected call');
+$t->comment('If you call setFailOnVerify(), an exception is thrown at the first unexpected method call');
 
   // fixtures
   $m = lime_mock::create('TestClass', new mock_lime_test());
@@ -287,7 +289,9 @@ $t->comment('By default, method parameters are compared with weak typing');
   $t->is($mockTest->fails, 0, 'No test failed');
 
 
-$t->comment('If you call setStrict(), method parameters are compared with strict typing - different types');
+$t->comment('If you call setStrict(), method parameters are compared with strict typing');
+
+  $t->comment('Case 1: Type comparison fails');
 
   // fixtures
   $m = lime_mock::create('TestClass', $mockTest = new mock_lime_test());
@@ -302,7 +306,7 @@ $t->comment('If you call setStrict(), method parameters are compared with strict
   $t->is($mockTest->fails, 1, 'One test failed');
 
 
-$t->comment('If you call setStrict(), method parameters are compared with strict typing - same type');
+  $t->comment('Case 2: Type comparison passes');
 
   // fixtures
   $m = lime_mock::create('TestClass', $mockTest = new mock_lime_test());
@@ -317,7 +321,9 @@ $t->comment('If you call setStrict(), method parameters are compared with strict
   $t->is($mockTest->fails, 0, 'No test failed');
 
 
-$t->comment('->times() specifies how often a method should be called - to few actual calls');
+$t->comment('->times() configures how often a method should be called');
+
+  $t->comment('Case 1: The method is called too seldom');
 
   // fixtures
   $m = lime_mock::create('TestClass', $mockTest = new mock_lime_test());
@@ -331,7 +337,7 @@ $t->comment('->times() specifies how often a method should be called - to few ac
   $t->is($mockTest->fails, 1, 'One test failed');
 
 
-$t->comment('->times() specifies how often a method should be called - to many actual calls');
+  $t->comment('Case 2: The method is called too often');
 
   // fixtures
   $m = lime_mock::create('TestClass', $mockTest = new mock_lime_test());
@@ -347,22 +353,7 @@ $t->comment('->times() specifies how often a method should be called - to many a
   $t->is($mockTest->fails, 1, 'One test failed');
 
 
-$t->comment('->times() specifies how often a method should be called - wrong parameters');
-
-  // fixtures
-  $m = lime_mock::create('TestClass', $mockTest = new mock_lime_test());
-  // test
-  $m->testMethod(1)->times(2);
-  $m->replay();
-  $m->testMethod(1);
-  $m->testMethod();
-  $m->verify();
-  // assertions
-  $t->is($mockTest->passes, 0, 'No test passed');
-  $t->is($mockTest->fails, 1, 'One test failed');
-
-
-$t->comment('->times() specifies how often a method should be called - correct number of actual calls');
+  $t->comment('Case 3: The number of method calls matches times()');
 
   // fixtures
   $m = lime_mock::create('TestClass', $mockTest = new mock_lime_test());
@@ -375,6 +366,21 @@ $t->comment('->times() specifies how often a method should be called - correct n
   // assertions
   $t->is($mockTest->passes, 1, 'One test passed');
   $t->is($mockTest->fails, 0, 'No test failed');
+
+
+  $t->comment('Case 4: The method is called with different parameters');
+
+  // fixtures
+  $m = lime_mock::create('TestClass', $mockTest = new mock_lime_test());
+  // test
+  $m->testMethod(1)->times(2);
+  $m->replay();
+  $m->testMethod(1);
+  $m->testMethod();
+  $m->verify();
+  // assertions
+  $t->is($mockTest->passes, 0, 'No test passed');
+  $t->is($mockTest->fails, 1, 'One test failed');
 
 
 $t->comment('->times() and ->returns() can be combined');
