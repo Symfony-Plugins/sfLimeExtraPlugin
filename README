@@ -1,12 +1,302 @@
-This plugin contains a grid subframework that allows to read various data sources in a unified way. These data sources can be rendered in a 
-customizable grid with a custom formatter. The code of this plugin will eventually become bundled with symfony 1.3.
+Creating Stubs and Mocks with sfLimeExtraPlugin
+===============================================
 
-Currently, arrays and Doctrine tables can be used as data sources. Propel, XML and CSV are planned for the final version Only a HTML formatter is 
-currently supported. A raw text formatter and an XML formatter are planned for the final version.
+Stubs and mock objects can simulate the behaviour of real classes. They are
+useful for testing code that depends on third classes (the "dependent-on 
+component"). For the purpose of the test it is mostly sufficient though to 
+provide a fake object that behaves as if it was the real class without ever 
+executing the real class's code.
 
-THIS PLUGIN IS IN VERY EARLY ALPHA STAGES AND IS NOT RECOMMENDED FOR PRODUCTION USE.
+sfLimeExtraPlugin provides a light-weight and intuitive mocking framework for
+use with **lime**.
 
-LICENSE
+**Attention: This plugin is still in its alpha stages and subject to change.
+I would be happy if you want to try it out to give me feedback.**
+
+
+Installation
+------------
+
+The plugin can be obtained by checking it out from SVN:
+
+    svn co http://svn.symfony-project.com/plugins/sfLimeExtraPlugin/trunk
+  
+As soon as the plugin is installed, it is ready to use.
+
+
+Stubs
+-----
+
+Stubs are objects that offer the same methods as the stubbed class but usually
+return fixed values for the purpose of a test. Let's start with the following
+class as example:
+
+    [php]
+    class User
+    {
+      protected $storage;
+      
+      public function User(SessionStorage $storage)
+      {
+        $this->storage = $storage;
+      }
+      
+      public function setAttribute($name, $value)
+      {
+        $this->storage->write($name, $value);
+        $this->storage->close();
+      }
+      
+      public function getAttribute($name)
+      {
+        return $this->storage->read($name);
+      }
+    }
+    
+Let's look at a unit test for ``setAttribute()``:
+
+    [php]
+    $t->comment('Attributes can be read from the session');
+    
+      // fixture
+      $stub = new SessionStorageDatabase();
+      $stub->write('Foo', 'Bar');
+      $stub->close();
+      $u = new User($stub);
+      // test
+      $value = $u->getAttribute('Foo');
+      // assertions
+      $t->is($value, 'Bar', 'The value has been read');
+
+Now ``SessionStorage`` might require access to the file system or access to a 
+database, as in our case. Accessing a database everytime you test your ``User`` 
+class will heavily affect the speed of your tests. Thus the option is to replace 
+``SessionStorage`` with a fake implementation (a stub).
+
+    [php]
+    class StubSessionStorage implements SessionStorage
+    {
+      private $name;
+      private $value;
+      
+      public function __construct($name, $value)
+      {
+        $this->name = $name;
+        $this->value = $value;
+      }
+      
+      public function read($name)
+      {
+        return $name == $this->name ? $value : null;
+      }
+    
+      public function write($name, $value) {}
+      public function close() {}
+    }
+    
+Let's adapt our test to use the ``StubSessionStorage``:
+
+    [php]
+    $t->comment('Attributes can be read from the session');
+    
+      // fixture
+      $u = new User(new StubSessionStorage('Foo', 'Bar'));
+      // test
+      $value = $u->getAttribute('Foo');
+      // assertions
+      $t->is($value, 'Bar', 'The value has been read');
+      
+As you can see, our test just got a lot easier to read. The drawback is that
+we had to invest a lot of code into writing our stub class. Usually it is
+worth the effort though, because the stub class can be reused in other tests.
+Especially in the long term, a good test readability and maintainability pays
+off.
+
+Note how we injected the name and the value of the expected parameter into
+our stub class. This means again more code in the stub class, but in the test
+it is very clear why ``getAttribute()`` should return ``'Bar'`` when called
+with the argument ``'Foo'``.
+
+sfLimeExtraPlugin provides you with facilities to create stubs a lot easier
+than by having to write your own stub classes. With sfLimeExtraPlugin, we can
+change the test above code to:
+
+    [php]
+    $t->comment('Attributes can be read from the session');
+    
+      // fixture
+      $stub = lime_mock::create('SessionStorage');
+      $stub->read('Foo')->returns('Bar');
+      $stub->replay();
+      $u = new User($stub);
+      // test
+      $value = $u->getAttribute('Foo');
+      // assertions
+      $t->is($value, 'Bar', 'The value has been read');
+      
+As you can see, we just create the stub by calling ``lime_mock::create()`` with
+the stubbed class or interface name. Then we "record" the methods that should
+be called with what parameters and their return values. In the end we switch
+the storage to "replay" mode. In this mode, the methods that we just configured
+will return the desired return values, when called with the right arguments.
+
+
+Mock Objects
+------------
+
+Sometimes it is not enough to replace a dependent-on component by setting up
+static method return values. In some cases you will also want to test whether
+the dependent-on component receives the right data and method calls.
+
+For this purpose we will extend our last example a bit. We don't only want to
+test whether the user can read attributes from the session, but we also want to
+test whether attributes are written correctly *into* the session.
+
+    [php]
+    $t->comment('Attributes can be stored permanently');
+    
+      // fixture
+      $mock = lime_mock::create('SessionStorage', $t);
+      $mock->write('Foo', 'Bar');
+      $mock->close();
+      $mock->replay();
+      $u = new User($mock);
+      // test
+      $u->setAttribute('Foo', 'Bar');
+      // assertions
+      $mock->verify();
+      
+In this example, the new concept of *verification* comes into play. After
+executing your test code you can call ``verify()`` on the mock object to verify
+whether all the expected methods have been called with the right parameters.
+If any of the methods would not have been called, ``verify()`` would result
+in a failed test.
+
+
+Modifiers
+=========
+
+This section covers the capabilities of the mock objects. It describes which
+methods you have to call to configure the mock for your needs.
+
+
+``returns()``
+-------------
+
+Configures a method to return a specific value.
+
+    [php]
+    $mock->doSomething()->returns('Foobar');
+    $mock->replay();
+    
+    echo $mock->doSomething(); // prints 'Foobar'
+    
+    
+``throws()``
+------------
+
+Configures a method to throw a specific exception.
+
+    [php]
+    $mock->doSomething()->throws('InvalidArgumentException');
+    $mock->replay();
+    
+    $mock->doSomething(); // throws an InvalidArgumentException
+    
+    
+``times()``
+-----------
+
+Configures a method to be called a specific number of times.
+
+    [php]
+    $mock->doSomething()->times(2);
+    $mock->replay();
+    
+    $mock->doSomething();
+    $mock->verify(); // results in a failed test
+    
+    
+``setFailOnVerify()``
+---------------------
+    
+If an unexpected method is called or if a method is called to often, a 
+``lime_expectation_exception`` is thrown.
+
+    [php]
+    $mock->doSomething()->times(2);
+    $mock->replay();
+    
+    $mock->doSomething();
+    $mock->doSomething();
+    $mock->doSomething(); // throws a lime_expectation_exception
+    
+This is very useful for discovering where the unexpected call resulted from. You
+can suppress this behaviour though by calling ``setFailOnVerify()``, so that
+your code will only be validated when ``verify()`` is called.
+
+    [php]
+    $mock->doSomething()->times(2);
+    $mock->replay();
+    
+    $mock->doSomething();
+    $mock->doSomething();
+    $mock->doSomething();
+    $mock->verify(); // results in a failed test
+    
+    
+``setExpectNothing()``
+----------------------
+
+By default, all method calls are ignored if you did not set up any expected
+methods.
+
+    [php]
+    $mock->replay();
+    $mock->doSomething(); // ignored
+    $mock->verify(); // results in a passed test
+    
+You can configure the mock though to verify that exactly no method has been
+called:
+
+    [php]
+    $mock->setExpectNothing();
+    $mock->doSomething(); // throws a lime_expectation_exception
+    
+    
+Mocking A Modifier
+------------------
+
+For each mock object, the following methods are generated automatically:
+
+* ``verify()``
+* ``replay()``
+* ``setExpectNothing``
+* ``setStrict()``
+* ``setFailOnVerify()``
+
+These methods allow for a very comfortable usage. The drawback is that you
+cannot mock methods with the same name in your class.
+
+    [php]
+    $mock = lime_mock::create('MusicPlayer', $t);
+    $mock->replay()->returns('...'); // does not work
+    
+The solution is, to set the third parameter ``$generateControls`` to ``false``
+when calling ``create()``. When you do that, you will have to call the above
+methods statically in ``lime_mock`` with the mock object as first argument.
+
+    [php]
+    $mock = lime_mock::create('MusicPlayer', $t, false);
+    $mock->replay()->returns('Foobar');
+    lime_mock::replay($mock);
+    
+    echo $mock->replay(); // prints 'Foobar'
+    
+    lime_mock::verify($mock); // results in a successful test
+    
+
+License
 -------
 
 see LICENSE file
