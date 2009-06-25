@@ -70,6 +70,7 @@ $t->comment('Methods in the mocked class are not called');
   TestClass::$calls = 0;
   $m = lime_mock::create('TestClass');
   // test
+  $m->replay();
   $m->testMethod();
   // assertions
   $t->is(TestClass::$calls, 0, 'The method has not been called');
@@ -255,6 +256,22 @@ $t->comment('Methods may be called in any order');
   $t->is($mockTest->passes, 1, 'One test passed');
   $t->is($mockTest->fails, 0, 'No test failed');
 
+
+  /*
+$t->comment('Methods may be called any number of times');
+
+  // fixtures
+  $m = lime_mock::create('TestClass', $mockTest = new mock_lime_test());
+  // test
+  $m->testMethod();
+  $m->replay();
+  $m->testMethod();
+  $m->testMethod();
+  $m->verify();
+  // assertions
+  $t->is($mockTest->passes, 1, 'One test passed');
+  $t->is($mockTest->fails, 0, 'No test failed');
+  */
 
 $t->comment('If you call setFailOnVerify(), an exception is thrown at the first unexpected method call');
 

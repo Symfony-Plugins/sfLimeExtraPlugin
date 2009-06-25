@@ -88,7 +88,7 @@ class lime_mock_control implements lime_mock_interface
   public function __construct(lime_test $test = null)
   {
     $this->test = $test;
-    $this->expectationList = new lime_expectation_list($test);
+    $this->expectationList = new lime_expectation_bag($test);
   }
 
   /**
