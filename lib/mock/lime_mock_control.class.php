@@ -128,6 +128,14 @@ class lime_mock_control implements lime_mock_interface
   }
 
   /**
+   * Configures the mock to expect exactly no method call.
+   */
+  public function setExpectNothing()
+  {
+    $this->expectationList->setExpectNothing();
+  }
+
+  /**
    * (non-PHPdoc)
    * @see lib/lime_verifiable#setFailOnVerify()
    */

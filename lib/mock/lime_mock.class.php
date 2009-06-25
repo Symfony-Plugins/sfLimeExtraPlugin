@@ -261,6 +261,14 @@ class lime_mock
     return $mock->__lime_getControl()->setFailOnVerify();
   }
 
+  /**
+   * Configures the mock to expect no method call.
+   */
+  public static function setExpectNothing()
+  {
+    return $mock->__lime_getControl()->setExpectNothing();
+  }
+
 }
 
 

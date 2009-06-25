@@ -35,7 +35,7 @@ class TestClass
 class TestException extends Exception {}
 
 
-$t = new lime_test(42, new lime_output_color());
+$t = new lime_test(45, new lime_output_color());
 
 
 $t->comment('Interfaces can be mocked');
@@ -441,3 +441,35 @@ $t->comment('The control methods like ->replay() can be mocked');
   $value = $m->replay();
   // assertions
   $t->is($value, 'Foobar', 'The return value was correct');
+
+
+$t->comment('If no method call is expected, all method calls are ignored');
+
+  // fixtures
+  $m = lime_mock::create('TestClass', $mockTest = new mock_lime_test());
+  // test
+  $m->replay();
+  $m->testMethod1();
+  $m->testMethod2(1, 'Foobar');
+  $m->verify();
+  // assertions
+  $t->is($mockTest->passes, 1, 'One test passed');
+  $t->is($mockTest->fails, 0, 'No test failed');
+
+
+$t->comment('If setExpectNothing() is called, no method must be called');
+
+  // fixtures
+  $m = lime_mock::create('TestClass', $mockTest = new mock_lime_test());
+  // test
+  $m->setExpectNothing();
+  $m->replay();
+  try
+  {
+    $m->testMethod();
+    $t->fail('A "lime_expectation_exception" is thrown');
+  }
+  catch (lime_expectation_exception $e)
+  {
+    $t->pass('A "lime_expectation_exception" is thrown');
+  }
