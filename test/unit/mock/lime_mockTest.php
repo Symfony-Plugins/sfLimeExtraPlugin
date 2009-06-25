@@ -35,7 +35,7 @@ class TestClass
 class TestException extends Exception {}
 
 
-$t = new lime_test(46, new lime_output_color());
+$t = new lime_test(42, new lime_output_color());
 
 
 $t->comment('Interfaces can be mocked');
@@ -150,25 +150,48 @@ $t->comment('->verify() fails if a method was not called');
   $t->is($mockTest->passes, 0, 'No test passed');
 
 
-$t->comment('->verify() fails if a method was called with wrong parameters');
+$t->comment('An exception is thrown if a method is called with wrong parameters');
 
   // fixtures
   $m = lime_mock::create('TestClass', $mockTest = new mock_lime_test());
   // test
   $m->testMethod(1, 'Foobar');
   $m->replay();
-  $m->testMethod(1);
-  $m->verify();
-  // assertions
-  $t->is($mockTest->fails, 1, 'One test failed');
-  $t->is($mockTest->passes, 0, 'No test passed');
+  try
+  {
+    $m->testMethod(1);
+    $t->fail('A "lime_expectation_exception" is thrown');
+  }
+  catch (lime_expectation_exception $e)
+  {
+    $t->pass('A "lime_expectation_exception" is thrown');
+  }
 
 
-$t->comment('->verify() fails if a method was called with the right parameters in a wrong order');
+$t->comment('An exception is thrown if a method is called with the right parameters in a wrong order');
 
   // fixtures
   $m = lime_mock::create('TestClass', $mockTest = new mock_lime_test());
   // test
+  $m->testMethod(1, 'Foobar');
+  $m->replay();
+  try
+  {
+    $m->testMethod('Foobar', 1);
+    $t->fail('A "lime_expectation_exception" is thrown');
+  }
+  catch (lime_expectation_exception $e)
+  {
+    $t->pass('A "lime_expectation_exception" is thrown');
+  }
+
+
+$t->comment('setFailOnVerify() suppresses exceptions upon method calls');
+
+  // fixtures
+  $m = lime_mock::create('TestClass', $mockTest = new mock_lime_test());
+  // test
+  $m->setFailOnVerify();
   $m->testMethod(1, 'Foobar');
   $m->replay();
   $m->testMethod('Foobar', 1);
@@ -273,24 +296,6 @@ $t->comment('Methods may be called any number of times');
   $t->is($mockTest->fails, 0, 'No test failed');
   */
 
-$t->comment('If you call setFailOnVerify(), an exception is thrown at the first unexpected method call');
-
-  // fixtures
-  $m = lime_mock::create('TestClass', new mock_lime_test());
-  // test
-  $m->setFailOnVerify();
-  $m->testMethod();
-  $m->replay();
-  try
-  {
-    $m->testMethod('foobar');
-    $t->fail('A "lime_expectation_exception" is thrown');
-  }
-  catch (lime_expectation_exception $e)
-  {
-    $t->pass('A "lime_expectation_exception" is thrown');
-  }
-
 
 $t->comment('By default, method parameters are compared with weak typing');
 
@@ -316,11 +321,15 @@ $t->comment('If you call setStrict(), method parameters are compared with strict
   $m->setStrict();
   $m->testMethod(1);
   $m->replay();
-  $m->testMethod('1');
-  $m->verify();
-  // assertions
-  $t->is($mockTest->passes, 0, 'No test passed');
-  $t->is($mockTest->fails, 1, 'One test failed');
+  try
+  {
+    $m->testMethod('1');
+    $t->fail('A "lime_expectation_exception" is thrown');
+  }
+  catch (lime_expectation_exception $e)
+  {
+    $t->pass('A "lime_expectation_exception" is thrown');
+  }
 
 
   $t->comment('Case 2: Type comparison passes');
@@ -363,11 +372,15 @@ $t->comment('->times() configures how often a method should be called');
   $m->replay();
   $m->testMethod(1);
   $m->testMethod(1);
-  $m->testMethod(1);
-  $m->verify();
-  // assertions
-  $t->is($mockTest->passes, 0, 'No test passed');
-  $t->is($mockTest->fails, 1, 'One test failed');
+  try
+  {
+    $m->testMethod(1);
+    $t->fail('A "lime_expectation_exception" is thrown');
+  }
+  catch (lime_expectation_exception $e)
+  {
+    $t->pass('A "lime_expectation_exception" is thrown');
+  }
 
 
   $t->comment('Case 3: The number of method calls matches times()');
@@ -393,11 +406,15 @@ $t->comment('->times() configures how often a method should be called');
   $m->testMethod(1)->times(2);
   $m->replay();
   $m->testMethod(1);
-  $m->testMethod();
-  $m->verify();
-  // assertions
-  $t->is($mockTest->passes, 0, 'No test passed');
-  $t->is($mockTest->fails, 1, 'One test failed');
+  try
+  {
+    $m->testMethod();
+    $t->fail('A "lime_expectation_exception" is thrown');
+  }
+  catch (lime_expectation_exception $e)
+  {
+    $t->pass('A "lime_expectation_exception" is thrown');
+  }
 
 
 $t->comment('->times() and ->returns() can be combined');
