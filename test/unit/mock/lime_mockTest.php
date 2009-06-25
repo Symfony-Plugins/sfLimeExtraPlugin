@@ -14,12 +14,22 @@ include dirname(__FILE__).'/../mock_lime_test.class.php';
 
 interface TestInterface
 {
-  public function testMethod();
+  public function testMethod($parameter);
+}
+
+interface TestInterfaceWithTypeHints
+{
+  public function testMethod(stdClass $object, array $array);
+}
+
+interface TestInterfaceWithDefaultValues
+{
+  public function testMethod($null = null, $int = 1, $bool = true, $string = 'String', $float = 1.1);
 }
 
 abstract class TestClassAbstract
 {
-  abstract public function testMethod();
+  abstract public function testMethod($parameter);
 }
 
 class TestClass
@@ -35,7 +45,7 @@ class TestClass
 class TestException extends Exception {}
 
 
-$t = new lime_test(45, new lime_output_color());
+$t = new lime_test(47, new lime_output_color());
 
 
 $t->comment('Interfaces can be mocked');
@@ -62,6 +72,22 @@ $t->comment('Non-existing classes can be mocked');
   // assertions
   $t->ok($m instanceof FoobarClass, 'The mock generates and inherits the class');
   $t->ok($m instanceof lime_mock_interface, 'The mock implements "lime_mock_interface"');
+
+
+$t->comment('Methods with type hints can be mocked');
+
+  // test
+  $m = lime_mock::create('TestInterfaceWithTypeHints');
+  // assertions
+  $t->ok($m instanceof TestInterfaceWithTypeHints, 'The mock implements the interface');
+
+
+$t->comment('Methods with default values can be mocked');
+
+  // test
+  $m = lime_mock::create('TestInterfaceWithDefaultValues');
+  // assertions
+  $t->ok($m instanceof TestInterfaceWithDefaultValues, 'The mock implements the interface');
 
 
 $t->comment('Methods in the mocked class are not called');

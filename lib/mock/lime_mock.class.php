@@ -140,7 +140,11 @@ class lime_mock
    * A template for overridden abstract methods in base classes/interfaces.
    * @var string
    */
-  protected static $methodTemplate = '%s function %s() { $args = func_get_args(); return $this->__call(%s, $args); }';
+  protected static $methodTemplate = '%s function %s(%s) { $args = func_get_args(); return $this->__call(%s, $args); }';
+
+  protected static $parameterTemplate = '%s %s';
+
+  protected static $parameterWithDefaultTemplate = '%s %s = %s';
 
   /**
    * Creates a new mock object for the given class or interface name.
@@ -176,7 +180,36 @@ class lime_mock
       $modifiers = Reflection::getModifierNames($method->getModifiers());
       $modifiers = array_diff($modifiers, array('abstract'));
       $modifiers = implode(' ', $modifiers);
-      $methods .= sprintf(self::$methodTemplate, $modifiers, $method->getName(), $method->getName());
+
+      $parameters = array();
+
+      foreach ($method->getParameters() as $parameter)
+      {
+        /* @var $parameter ReflectionParameter */
+        if ($parameter->getClass())
+        {
+          $typeHint = $parameter->getClass()->getName();
+        }
+        else if ($parameter->isArray())
+        {
+          $typeHint = 'array';
+        }
+
+        $name = '$'.$parameter->getName();
+
+        if ($parameter->isOptional())
+        {
+          $default = var_export($parameter->getDefaultValue(), true);
+          $parameters[] = sprintf(self::$parameterWithDefaultTemplate, $typeHint, $name, $default);
+        }
+        else
+        {
+          $parameters[] = sprintf(self::$parameterTemplate, $typeHint, $name);
+        }
+      }
+
+      $methods .= sprintf(self::$methodTemplate, $modifiers, $method->getName(),
+          implode(', ', $parameters), $method->getName());
     }
 
     $interfaces = array();
