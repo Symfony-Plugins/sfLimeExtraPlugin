@@ -9,18 +9,21 @@
  */
 
 /**
- * An ordered expectation collection.
+ * An ordered expectation collection where the amount of elements is not
+ * important.
  *
  * This implementation of lime_expectation_collection compares expected
- * and actual values taking their order into account.
+ * and actual values ignoring their order. This class also does not care
+ * if a value is added more than once.
  *
- * The following example will NOT verify successfully:
+ * The following example will verify successfully:
  *
  * <code>
  *   $list = new lime_expectationList($t);
  *   $list->addExpected(1);
  *   $list->addExpected(2);
  *   $list->addActual(2);
+ *   $list->addActual(1);
  *   $list->addActual(1);
  *   $list->verify();
  * </code>
@@ -33,25 +36,32 @@ class lime_expectation_set extends lime_expectation_collection
 {
 
   /**
-   * The cursor pointing on the currently expected value
-   * @var integer
-   */
-  protected $cursor = 0;
-
-  /**
    * (non-PHPdoc)
    * @see lib/expectation/lime_expectation_collection#addActual($value)
    */
   public function addActual($value)
   {
-    if ($this->failOnVerify && $this->expected[$this->cursor] != $value)
+    if ($this->failOnVerify && !in_array($value, $this->expected))
     {
       throw new lime_expectation_exception('Unexpected value "'.$value.'"');
     }
 
-    ++$this->cursor;
-
     parent::addActual($value);
+  }
+
+  /**
+   * (non-PHPdoc)
+   * @see lib/expectation/lime_expectation_collection#verify()
+   */
+  public function verify()
+  {
+    sort($this->actual);
+    sort($this->expected);
+
+    $this->actual = array_unique($this->actual);
+    $this->expected = array_unique($this->expected);
+
+    parent::verify();
   }
 
 }
