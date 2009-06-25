@@ -1,107 +1,110 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<package packagerversion="1.4.6" version="2.0" xmlns="http://pear.php.net/dtd/package-2.0" xmlns:tasks="http://pear.php.net/dtd/tasks-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pear.php.net/dtd/tasks-1.0 http://pear.php.net/dtd/tasks-1.0.xsd http://pear.php.net/dtd/package-2.0 http://pear.php.net/dtd/package-2.0.xsd">
- <name>sfLimeExtraPlugin</name>
- <channel>plugins.symfony-project.org</channel>
- <summary>Supports generating mock objects for lime</summary>
- <description></description>
- <lead>
-  <name>Bernhard Schussek</name>
-  <user>bschussek</user>
-  <email>bschussek@gmail.com</email>
-  <active>yes</active>
- </lead>
- <date>2009-06-25</date>
- <time>15:12:00</time>
- <version>
-  <release>0.1.0</release>
-  <api>0.1.0</api>
- </version>
- <stability>
-  <release>alpha</release>
-  <api>alpha</api>
- </stability>
- <license uri="http://www.symfony-project.org/license">MIT license</license>
- <notes>-</notes>
- <contents>
-  <dir name="/">
-   <file role="data" name="README" />
-   <file role="data" name="LICENSE" />
-   <dir name="lib">
-    <dir name="expectation">
-     <file role="data" name="lime_expectation_bag.class.php" />
-     <file role="data" name="lime_expectation_collection.class.php" />
-     <file role="data" name="lime_expectation_exception.class.php" />
-     <file role="data" name="lime_expectation_list.class.php" />
-     <file role="data" name="lime_expectation_set.class.php" />
-    </dir>
-    <dir name="mock">
-     <dir name="template">
-      <file role="data" name="mocked_class.tpl" />
-     </dir>
-     <file role="data" name="lime_mock_control.class.php" />
-     <file role="data" name="lime_mock_interface.class.php" />
-     <file role="data" name="lime_mock_template.class.php" />
-     <file role="data" name="lime_mock.class.php" />
-    </dir>
-    <dir name="output">
-     <file role="data" name="lime_output_silent.class.php" />
-    </dir>
-    <file role="data" name="lime_verifiable.class.php" />
-   </dir>
-   <dir name="test">
-    <dir name="bin">
-     <file role="data" name="prove.php" />
-    </dir>
-    <dir name="bootstrap">
-     <file role="data" name="unit.php" />
-    </dir>
-    <dir name="unit">
-     <dir name="expectation">
-      <file role="data" name="lime_expectation_bagTest.php" />
-      <file role="data" name="lime_expectation_collectionTest.php" />
-      <file role="data" name="lime_expectation_listTest.php" />
-      <file role="data" name="lime_expectation_setTest.php" />
-     </dir>
-     <dir name="mock">
-      <file role="data" name="lime_mockTest.php" />
-     </dir>
-     <file role="data" name="mock_lime_test.class.php" />
-    </dir>
-   </dir>
-  </dir>
- </contents>
- <dependencies>
-  <required>
-   <php>
-    <min>5.2.3</min>
-   </php>
-   <pearinstaller>
-    <min>1.4.1</min>
-   </pearinstaller>
-   <package>
-    <name>symfony</name>
-    <channel>pear.symfony-project.com</channel>
-    <min>1.1.0</min>
-    <max>1.3.0</max>
-   </package>
-  </required>
- </dependencies>
- <phprelease />
- <changelog>
-  <release>
-   <version>
-    <release>0.1.0</release>
-    <api>0.1.0</api>
-   </version>
-   <stability>
-    <release>alpha</release>
-    <api>alpha</api>
-   </stability>
-   <license uri="http://www.symfony-project.org/license">MIT license</license>
-   <date>2009-06-25</date>
-   <notes>
+<package packagerversion="1.4.6" version="2.0"
+	xmlns="http://pear.php.net/dtd/package-2.0" xmlns:tasks="http://pear.php.net/dtd/tasks-1.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://pear.php.net/dtd/tasks-1.0 http://pear.php.net/dtd/tasks-1.0.xsd http://pear.php.net/dtd/package-2.0 http://pear.php.net/dtd/package-2.0.xsd">
+	<name>sfLimeExtraPlugin</name>
+	<channel>plugins.symfony-project.org</channel>
+	<summary>Supports generating mock objects for lime</summary>
+	<description>Supports generating mock objects for lime</description>
+	<lead>
+		<name>Bernhard Schussek</name>
+		<user>bschussek</user>
+		<email>bschussek@gmail.com</email>
+		<active>yes</active>
+	</lead>
+	<date>2009-06-25</date>
+	<time>15:12:00</time>
+	<version>
+		<release>0.1.0</release>
+		<api>0.1.0</api>
+	</version>
+	<stability>
+		<release>alpha</release>
+		<api>alpha</api>
+	</stability>
+	<license uri="http://www.symfony-project.org/license">MIT license</license>
+	<notes>-</notes>
+	<contents>
+		<dir name="/">
+			<file role="data" name="README" />
+			<file role="data" name="LICENSE" />
+			<dir name="lib">
+				<dir name="expectation">
+					<file role="data" name="lime_expectation_bag.class.php" />
+					<file role="data" name="lime_expectation_collection.class.php" />
+					<file role="data" name="lime_expectation_exception.class.php" />
+					<file role="data" name="lime_expectation_list.class.php" />
+					<file role="data" name="lime_expectation_set.class.php" />
+				</dir>
+				<dir name="mock">
+					<dir name="template">
+						<file role="data" name="mocked_class.tpl" />
+					</dir>
+					<file role="data" name="lime_mock_control.class.php" />
+					<file role="data" name="lime_mock_interface.class.php" />
+					<file role="data" name="lime_mock_template.class.php" />
+					<file role="data" name="lime_mock.class.php" />
+				</dir>
+				<dir name="output">
+					<file role="data" name="lime_output_silent.class.php" />
+				</dir>
+				<file role="data" name="lime_verifiable.class.php" />
+			</dir>
+			<dir name="test">
+				<dir name="bin">
+					<file role="data" name="prove.php" />
+				</dir>
+				<dir name="bootstrap">
+					<file role="data" name="unit.php" />
+				</dir>
+				<dir name="unit">
+					<dir name="expectation">
+						<file role="data" name="lime_expectation_bagTest.php" />
+						<file role="data" name="lime_expectation_collectionTest.php" />
+						<file role="data" name="lime_expectation_listTest.php" />
+						<file role="data" name="lime_expectation_setTest.php" />
+					</dir>
+					<dir name="mock">
+						<file role="data" name="lime_mockTest.php" />
+					</dir>
+					<file role="data" name="mock_lime_test.class.php" />
+				</dir>
+			</dir>
+		</dir>
+	</contents>
+	<dependencies>
+		<required>
+			<php>
+				<min>5.2.3</min>
+			</php>
+			<pearinstaller>
+				<min>1.4.1</min>
+			</pearinstaller>
+			<package>
+				<name>symfony</name>
+				<channel>pear.symfony-project.com</channel>
+				<min>1.1.0</min>
+				<max>1.3.0</max>
+			</package>
+		</required>
+	</dependencies>
+	<phprelease />
+	<changelog>
+		<release>
+			<version>
+				<release>0.1.0</release>
+				<api>0.1.0</api>
+			</version>
+			<stability>
+				<release>alpha</release>
+				<api>alpha</api>
+			</stability>
+			<license uri="http://www.symfony-project.org/license">MIT license</license>
+			<date>2009-06-25</date>
+			<notes>
      Alpha developer preview.
    </notes>
-  </release>
- </changelog>
+		</release>
+	</changelog>
 </package>
