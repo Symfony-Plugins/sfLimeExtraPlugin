@@ -39,7 +39,7 @@
  * The available annotations are:
  *
  *   * @BeforeAll  Executed before the whole test suite
- *   * @Before     Executed for each test
+ *   * @Before     Executed before each test
  *   * @After      Executed after each test
  *   * @AfterAll   Executed after the whole test suite
  *   * @Test       A test case
