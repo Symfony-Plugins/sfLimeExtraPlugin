@@ -11,7 +11,17 @@
 include dirname(__FILE__).'/../../bootstrap/unit.php';
 
 
-$t = new lime_test(19, new lime_output_color());
+class Test extends lime_test
+{
+
+  public function is_output($actual, $expected, $method='is')
+  {
+    $this->$method(trim($actual), trim($expected), 'The test file returns the expected output');
+  }
+}
+
+
+$t = new Test(19, new lime_output_color());
 
 // misuse harness to find PHP cli
 $h = new lime_harness(new lime_output_silent());
@@ -42,10 +52,9 @@ Test 1
 Before
 Test 2
  Looks like everything went fine.
-
 EOF;
   $t->is($result, 0, 'The file returned exit status 0 (success)');
-  $t->is($actual, $expected, 'The test file returns the expected output');
+  $t->is_output($actual, $expected);
 
 
 $t->comment('Code annotated with @After is executed once after every test');
@@ -60,10 +69,9 @@ After
 Test 2
 After
  Looks like everything went fine.
-
 EOF;
   $t->is($result, 0, 'The file returned exit status 0 (success)');
-  $t->is($actual, $expected, 'The test file returns the expected output');
+  $t->is_output($actual, $expected);
 
 
 $t->comment('Code annotated with @BeforeAll is executed once before the test suite');
@@ -77,10 +85,9 @@ Before All
 Test 1
 Test 2
  Looks like everything went fine.
-
 EOF;
   $t->is($result, 0, 'The file returned exit status 0 (success)');
-  $t->is($actual, $expected, 'The test file returns the expected output');
+  $t->is_output($actual, $expected);
 
 
 $t->comment('Code annotated with @AfterAll is executed once after the test suite');
@@ -94,10 +101,9 @@ Test 1
 Test 2
 After All
  Looks like everything went fine.
-
 EOF;
   $t->is($result, 0, 'The file returned exit status 0 (success)');
-  $t->is($actual, $expected, 'The test file returns the expected output');
+  $t->is_output($actual, $expected);
 
 
 $t->comment('Code before the first annotations is executed normally');
@@ -111,10 +117,9 @@ Before annotation
 Before
 Test
  Looks like everything went fine.
-
 EOF;
   $t->is($result, 0, 'The file returned exit status 0 (success)');
-  $t->is($actual, $expected, 'The test file returns the expected output');
+  $t->is_output($actual, $expected);
 
 
 $t->comment('Unknown annotations result in exceptions');
@@ -136,10 +141,9 @@ Before
 BeforeTest
 BeforeTestAfter
  Looks like everything went fine.
-
 EOF;
   $t->is($result, 0, 'The file returned exit status 0 (success)');
-  $t->is($actual, $expected, 'The test file returns the expected output');
+  $t->is_output($actual, $expected);
 
 
 $t->comment('Variables from the global scope are available in all other scopes');
@@ -154,10 +158,9 @@ GlobalBefore
 GlobalBeforeTest
 GlobalBeforeTestAfter
  Looks like everything went fine.
-
 EOF;
   $t->is($result, 0, 'The file returned exit status 0 (success)');
-  $t->is($actual, $expected, 'The test file returns the expected output');
+  $t->is_output($actual, $expected);
 
 
 $t->comment('Tests annotated with @Test may have comments');
@@ -171,10 +174,9 @@ Test 1
 # This test is commented
 Test 2
  Looks like everything went fine.
-
 EOF;
   $t->is($result, 0, 'The file returned exit status 0 (success)');
-  $t->is($actual, $expected, 'The test file returns the expected output');
+  $t->is_output($actual, $expected);
 
 
 $t->comment('Exceptions can be expected');
@@ -182,21 +184,20 @@ $t->comment('Exceptions can be expected');
   // test
   list($result, $actual) = execute('test_expect.php');
   // assertion
-  $expected = '/'.str_replace('%ANY%', '.*', preg_quote(<<<EOF
+  $expected = '/'.str_replace(array('%ANY%', '%EXCEPTION%'), array('.*', '"?RuntimeException"?'), preg_quote(<<<EOF
 1..2
 Test 1
-not ok 1 - A "RuntimeException" was thrown
+not ok 1 - A %EXCEPTION% was thrown
 #     Failed test (%ANY%)
 #            got: NULL
 #       expected: 'RuntimeException'
 Test 2
-ok 2 - A "RuntimeException" was thrown
+ok 2 - A %EXCEPTION% was thrown
  Looks like you failed 1 tests of 2.
-
 EOF
 )).'/';
   $t->is($result, 0, 'The file returned exit status 0 (success)');
-  $t->like($actual, $expected, 'The test file returns the expected output');
+  $t->is_output($actual, $expected, 'like');
 
 
 
