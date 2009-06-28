@@ -5,19 +5,19 @@
 	xsi:schemaLocation="http://pear.php.net/dtd/tasks-1.0 http://pear.php.net/dtd/tasks-1.0.xsd http://pear.php.net/dtd/package-2.0 http://pear.php.net/dtd/package-2.0.xsd">
 	<name>sfLimeExtraPlugin</name>
 	<channel>plugins.symfony-project.org</channel>
-	<summary>Supports generating mock objects for lime</summary>
-	<description>Supports generating mock objects for lime</description>
+	<summary>Mock and annotation support for lime</summary>
+	<description>Mock and annotation support for lime</description>
 	<lead>
 		<name>Bernhard Schussek</name>
 		<user>bschussek</user>
 		<email>bschussek@gmail.com</email>
 		<active>yes</active>
 	</lead>
-	<date>2009-06-25</date>
-	<time>15:12:00</time>
+	<date>2009-06-28</date>
+	<time>03:12:00</time>
 	<version>
-		<release>0.1.1</release>
-		<api>0.1.1</api>
+		<release>0.2.0</release>
+		<api>0.2.0</api>
 	</version>
 	<stability>
 		<release>alpha</release>
@@ -49,6 +49,9 @@
 				<dir name="output">
 					<file role="data" name="lime_output_silent.class.php" />
 				</dir>
+				<dir name="test">
+					<file role="data" name="lime_test_simple.class.php" />
+				</dir>
 				<file role="data" name="lime_verifiable.class.php" />
 			</dir>
 			<dir name="test">
@@ -67,6 +70,21 @@
 					</dir>
 					<dir name="mock">
 						<file role="data" name="lime_mockTest.php" />
+					</dir>
+					<dir name="test">
+						<dir name="fixtures">
+							<file role="data" name="test_after_all.php" />
+							<file role="data" name="test_after.php" />
+							<file role="data" name="test_before_all.php" />
+							<file role="data" name="test_before.php" />
+							<file role="data" name="test_code_before_annotations.php" />
+							<file role="data" name="test_comments.php" />
+							<file role="data" name="test_expect.php" />
+							<file role="data" name="test_ignore_unknown.php" />
+							<file role="data" name="test_scope_before.php" />
+							<file role="data" name="test_scope_global.php" />
+						</dir>
+						<file role="data" name="lime_test_simpleTest.php" />
 					</dir>
 					<file role="data" name="mock_lime_test.class.php" />
 				</dir>
@@ -102,9 +120,20 @@
 			</stability>
 			<license uri="http://www.symfony-project.org/license">MIT license</license>
 			<date>2009-06-25</date>
-			<notes>
-     Alpha developer preview.
-   </notes>
+			<notes>Alpha developer preview.</notes>
+		</release>
+		<release>
+			<version>
+				<release>0.2.0</release>
+				<api>0.2.0</api>
+			</version>
+			<stability>
+				<release>alpha</release>
+				<api>alpha</api>
+			</stability>
+			<license uri="http://www.symfony-project.org/license">MIT license</license>
+			<date>2009-06-28</date>
+			<notes>Added support for annotated test scripts. See the inline documentation of class lime_test_simple for details.</notes>
 		</release>
 	</changelog>
 </package>
