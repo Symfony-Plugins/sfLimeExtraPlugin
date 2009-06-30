@@ -426,28 +426,19 @@ class lime_test_simple extends lime_test
   {
     $script = null;
 
-    if (array_key_exists('PHP_SELF', $_SERVER) && $_SERVER['PHP_SELF'])
+    $traces = debug_backtrace();
+    $file = __FILE__;
+
+    for ($i = 0; $i < count($traces) && $file == __FILE__; ++$i)
     {
-      $script = $_SERVER['PHP_SELF'];
-    }
-    else if (array_key_exists('SCRIPT_NAME', $_SERVER) && $_SERVER['SCRIPT_NAME'])
-    {
-      $script = $_SERVER['SCRIPT_NAME'];
-    }
-    else if (array_key_exists('SCRIPT_FILENAME', $_SERVER) && $_SERVER['SCRIPT_FILENAME'])
-    {
-      $script = $_SERVER['SCRIPT_FILENAME'];
-    }
-    else
-    {
-      throw new RuntimeException('The name of the running script is not available!');
+      $file = $traces[$i]['file'];
     }
 
-    if (!is_file($script))
+    if (!is_file($file))
     {
-      throw new RuntimeException('The script name returned by $_SERVER is not valid: '.$script);
+      throw new RuntimeException('The script name from the traces is not valid: '.$file);
     }
 
-    return $script;
+    return $file;
   }
 }
