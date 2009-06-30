@@ -15,6 +15,9 @@ class TestClassDefinition
   public function testMethodDefinition()
   {
     function testNestedFunctionDefinition() {}
+
+    // test whether $this is ignored
+    $this->__toString();
   }
 }
 
