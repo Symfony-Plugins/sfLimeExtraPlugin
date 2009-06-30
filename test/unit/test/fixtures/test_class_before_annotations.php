@@ -27,4 +27,19 @@ abstract class TestAbstractClassDefinition {}
 $t = new lime_test_simple(0);
 
 // @Test
-echo "Test\n";
+try
+{
+  throw new Exception();
+} catch (Exception $e)
+{
+  echo "Try is not matched\n";
+}
+
+// @Test
+if (false)
+{
+}
+else
+{
+  echo "If is not matched\n";
+}

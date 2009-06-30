@@ -129,7 +129,8 @@ $t->comment('Classes can be defined before the annotations');
   // assertion
   $expected = <<<EOF
 1..0
-Test
+Try is not matched
+If is not matched
  Looks like everything went fine.
 EOF
 ;
