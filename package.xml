@@ -83,7 +83,7 @@
 							<file role="data" name="test_expect.php" />
 							<file role="data" name="test_function_before_annotations.php" />
 							<file role="data" name="test_ignore_unknown.php" />
-							<file role="data" name="test_multline_comments.php" />
+							<file role="data" name="test_multiline_comments.php" />
 							<file role="data" name="test_scope_before.php" />
 							<file role="data" name="test_scope_global.php" />
 						</dir>
