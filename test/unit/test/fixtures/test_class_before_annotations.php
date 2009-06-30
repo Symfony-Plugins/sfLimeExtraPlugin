@@ -20,6 +20,10 @@ class TestClassDefinition
 
 class TestClassDefinitionInOneLine {}
 
+interface TestInterfaceDefinition {}
+
+abstract class TestAbstractClassDefinition {}
+
 $t = new lime_test_simple(0);
 
 // @Test
