@@ -178,12 +178,23 @@ class lime_test_simple extends lime_test
       $this->variables = array_unique(array_merge($this->variables, $matches[0]));
     }
 
-    // replace classes and functions
+    // comment classes, interfaces and functions out
     if (preg_match_all('/(((abstract\s+)?class|interface)\s[\w\s]+\s*|function\s+\w+\s*\([^)]*\)\s*)(\{([^{}]*|(?4))*\})/si', $content, $matches))
     {
       foreach ($matches[0] as $block)
       {
         $content = str_replace($block, '/*'.$block.'*/', $content);
+      }
+    }
+
+    // remove multiline comments
+    if (preg_match_all('/\/\*.+\*\//sU', $content, $matches))
+    {
+      foreach ($matches[0] as $block)
+      {
+        // we need to preserve line breaks
+        $newBlock = preg_replace('/[^\n]+/', '', $block);
+        $content = str_replace($block, $newBlock, $content);
       }
     }
 
@@ -332,6 +343,7 @@ class lime_test_simple extends lime_test
    */
   protected function execute()
   {
+//    var_dump(file_get_contents($this->path));
     include $this->path;
 
     foreach ($this->beforeAllFunctions as $beforeAllFunction)

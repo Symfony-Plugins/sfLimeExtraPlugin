@@ -21,7 +21,7 @@ class Test extends lime_test
 }
 
 
-$t = new Test(23, new lime_output_color());
+$t = new Test(25, new lime_output_color());
 
 // misuse harness to find PHP cli
 $h = new lime_harness(new lime_output_silent());
@@ -229,3 +229,18 @@ EOF
 )).'/';
   $t->is($result, 0, 'The file returned exit status 0 (success)');
   $t->is_output($actual, $expected, 'like');
+
+
+$t->comment('Annotations can be commented out with /*...*/');
+
+  // test
+  list($result, $actual) = execute('test_multiline_comments.php');
+  // assertion
+  $expected = <<<EOF
+1..0
+Test 1
+Test 3
+ Looks like everything went fine.
+EOF;
+  $t->is($result, 0, 'The file returned exit status 0 (success)');
+  $t->is_output($actual, $expected);
