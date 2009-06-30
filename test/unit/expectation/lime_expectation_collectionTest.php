@@ -9,7 +9,7 @@
  */
 
 include dirname(__FILE__).'/../../bootstrap/unit.php';
-include dirname(__FILE__).'/../mock_lime_test.class.php';
+require_once dirname(__FILE__).'/../mock_lime_test.class.php';
 
 
 class TestExpectationCollection extends lime_expectation_collection
@@ -31,13 +31,23 @@ class TestExpectationCollection extends lime_expectation_collection
 }
 
 
-$t = new lime_test(21, new lime_output_color());
+$t = new lime_test_simple(21, new lime_output_color());
 
 
-$t->comment('No value expected, no value retrieved');
+// @Before
 
-  // fixtures
-  $l = new TestExpectationCollection($mockTest = new mock_lime_test());
+  $mockTest = new mock_lime_test();
+  $l = new TestExpectationCollection($mockTest);
+
+
+// @After
+
+  $mockTest = null;
+  $l = null;
+
+
+// @Test: No value expected, no value retrieved
+
   // test
   $l->verify();
   // assertions
@@ -45,10 +55,8 @@ $t->comment('No value expected, no value retrieved');
   $t->is($mockTest->fails, 0, 'No test failed');
 
 
-$t->comment('One value expected, no value retrieved');
+// @Test: One value expected, no value retrieved
 
-  // fixtures
-  $l = new TestExpectationCollection($mockTest = new mock_lime_test());
   // test
   $l->addExpected(1);
   $l->verify();
@@ -57,10 +65,8 @@ $t->comment('One value expected, no value retrieved');
   $t->is($mockTest->fails, 1, 'One test failed');
 
 
-$t->comment('One value expected, one different value retrieved');
+// @Test: One value expected, one different value retrieved
 
-  // fixtures
-  $l = new TestExpectationCollection($mockTest = new mock_lime_test());
   // test
   $l->addExpected(1);
   $l->addActual(2);
@@ -70,10 +76,8 @@ $t->comment('One value expected, one different value retrieved');
   $t->is($mockTest->fails, 1, 'One test failed');
 
 
-$t->comment('No expectations are set, added values are ignored');
+// @Test: No expectations are set, added values are ignored
 
-  // fixtures
-  $l = new TestExpectationCollection($mockTest = new mock_lime_test());
   // test
   $l->addActual(1);
   $l->verify();
@@ -82,44 +86,28 @@ $t->comment('No expectations are set, added values are ignored');
   $t->is($mockTest->fails, 0, 'No test failed');
 
 
-$t->comment('An exception is thrown if an unexpected value is added');
+// @Test: An exception is thrown if an unexpected value is added
 
   // fixtures
   $l = new TestExpectationCollection(new mock_lime_test(), false);
-  // test
   $l->addExpected('Foo');
-  try
-  {
-    $l->addActual('Bar');
-    $t->fail('A "lime_expectation_exception" is thrown');
-  }
-  catch (lime_expectation_exception $e)
-  {
-    $t->pass('A "lime_expectation_exception" is thrown');
-  }
-
-
-$t->comment('Exactly no values are expected');
-
-  // fixtures
-  $l = new TestExpectationCollection(new mock_lime_test(), false);
+  $t->expect('lime_expectation_exception');
   // test
+  $l->addActual('Bar');
+
+
+// @Test: Exactly no values are expected
+
+  // fixture
+  $l = new TestExpectationCollection(new mock_lime_test(), false);
   $l->setExpectNothing();
-  try
-  {
-    $l->addActual('Bar');
-    $t->fail('A "lime_expectation_exception" is thrown');
-  }
-  catch (lime_expectation_exception $e)
-  {
-    $t->pass('A "lime_expectation_exception" is thrown');
-  }
+  $t->expect('lime_expectation_exception');
+  // test
+  $l->addActual('Bar');
 
 
-$t->comment('The expected value was added');
+// @Test: The expected value was added
 
-  // fixtures
-  $l = new TestExpectationCollection($mockTest = new mock_lime_test());
   // test
   $l->addExpected(1);
   $l->addActual(1);
@@ -129,10 +117,8 @@ $t->comment('The expected value was added');
   $t->is($mockTest->fails, 0, 'No test failed');
 
 
-$t->comment('The list can contain a mix of different types');
+// @Test: The list can contain a mix of different types
 
-  // fixtures
-  $l = new TestExpectationCollection($mockTest = new mock_lime_test());
   // test
   $l->addExpected(1);
   $l->addExpected('Foobar');
@@ -146,7 +132,7 @@ $t->comment('The list can contain a mix of different types');
   $t->is($mockTest->fails, 0, 'No test failed');
 
 
-$t->comment('By default, values are compared with weak typing');
+// @Test: By default, values are compared with weak typing
 
   // fixtures
   $l = new TestExpectationCollection($mockTest = new mock_lime_test());
@@ -159,7 +145,7 @@ $t->comment('By default, values are compared with weak typing');
   $t->is($mockTest->fails, 0, 'No test failed');
 
 
-$t->comment('If you call setStrict(), values are compared with strict typing - different types');
+// @Test: If you call setStrict(), values are compared with strict typing - different types
 
   // fixtures
   $l = new TestExpectationCollection($mockTest = new mock_lime_test());
@@ -173,7 +159,7 @@ $t->comment('If you call setStrict(), values are compared with strict typing - d
   $t->is($mockTest->fails, 1, 'One test failed');
 
 
-$t->comment('If you call setStrict(), values are compared with strict typing - same types');
+// @Test: If you call setStrict(), values are compared with strict typing - same types
 
   // fixtures
   $l = new TestExpectationCollection($mockTest = new mock_lime_test());
@@ -187,17 +173,10 @@ $t->comment('If you call setStrict(), values are compared with strict typing - s
   $t->is($mockTest->fails, 0, 'No test failed');
 
 
-$t->comment('Calling verify() results in an exception if no test is set');
+// @Test: Calling verify() results in an exception if no test is set
 
   // fixtures
   $l = new TestExpectationCollection();
+  $t->expect('BadMethodCallException');
   // test
-  try
-  {
-    $l->verify();
-    $t->fail('A "BadMethodCallException" is thrown');
-  }
-  catch (BadMethodCallException $e)
-  {
-    $t->pass('A "BadMethodCallException" is thrown');
-  }
+  $l->verify();

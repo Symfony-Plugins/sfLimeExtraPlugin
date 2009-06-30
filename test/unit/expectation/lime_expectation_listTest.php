@@ -9,58 +9,52 @@
  */
 
 include dirname(__FILE__).'/../../bootstrap/unit.php';
-include dirname(__FILE__).'/../mock_lime_test.class.php';
+require_once dirname(__FILE__).'/../mock_lime_test.class.php';
 
 
-$t = new lime_test(4, new lime_output_color());
+$t = new lime_test_simple(4, new lime_output_color());
 
 
-$t->comment('Exceptions are thrown if unexpected values are added');
+// @Before
 
-  // fixtures
-  $l = new lime_expectation_list(new mock_lime_test());
-  // test
+  $mockTest = new mock_lime_test();
+  $l = new lime_expectation_list($mockTest);
+
+
+// @After
+
+  $mockTest = null;
+  $l = null;
+
+
+// @Test: Exceptions are thrown if unexpected values are added
+
+  // fixture
   $l->addExpected(1);
   $l->addExpected(2);
-  try
-  {
-    $l->addActual(2);
-    $t->fail('A "lime_expectation_exception" is thrown');
-  }
-  catch (lime_expectation_exception $e)
-  {
-    $t->pass('A "lime_expectation_exception" is thrown');
-  }
-
-
-$t->comment('Exceptions are thrown if expected values are added too often');
-
-  // fixtures
-  $l = new lime_expectation_list(new mock_lime_test());
+  $t->expect('lime_expectation_exception');
   // test
+  $l->addActual(2);
+
+
+// @Test: Exceptions are thrown if expected values are added too often
+
+  // fixture
   $l->addExpected(1);
   $l->addActual(1);
-  try
-  {
-    $l->addActual(1);
-    $t->fail('A "lime_expectation_exception" is thrown');
-  }
-  catch (lime_expectation_exception $e)
-  {
-    $t->pass('A "lime_expectation_exception" is thrown');
-  }
-
-
-$t->comment('setFailOnVerify() suppresses exceptions');
-
-  // fixtures
-  $b = new lime_expectation_list($mockTest = new mock_lime_test());
+  $t->expect('lime_expectation_exception');
   // test
-  $b->setFailOnVerify();
-  $b->addExpected(1);
-  $b->addActual(1);
-  $b->addActual(1);
-  $b->verify();
+  $l->addActual(1);
+
+
+// @Test: setFailOnVerify() suppresses exceptions
+
+  // test
+  $l->setFailOnVerify();
+  $l->addExpected(1);
+  $l->addActual(1);
+  $l->addActual(1);
+  $l->verify();
   // assertions
   $t->is($mockTest->passes, 0, 'No test passed');
   $t->is($mockTest->fails, 1, 'One test failed');

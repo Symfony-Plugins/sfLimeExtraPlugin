@@ -9,16 +9,26 @@
  */
 
 include dirname(__FILE__).'/../../bootstrap/unit.php';
-include dirname(__FILE__).'/../mock_lime_test.class.php';
+require_once dirname(__FILE__).'/../mock_lime_test.class.php';
 
 
-$t = new lime_test(6, new lime_output_color());
+$t = new lime_test_simple(6, new lime_output_color());
 
 
-$t->comment('Expected values can be added in any order');
+// @Before
 
-  // fixtures
-  $b = new lime_expectation_bag($mockTest = new mock_lime_test());
+  $mockTest = new mock_lime_test();
+  $b = new lime_expectation_bag($mockTest);
+
+
+// @After
+
+  $mockTest = null;
+  $b = null;
+
+
+// @Test: Expected values can be added in any order
+
   // test
   $b->addExpected(1);
   $b->addExpected(3);
@@ -32,45 +42,27 @@ $t->comment('Expected values can be added in any order');
   $t->is($mockTest->fails, 0, 'No test failed');
 
 
-$t->comment('Exceptions are thrown if unexpected values are added');
+// @Test: Exceptions are thrown if unexpected values are added
 
   // fixtures
-  $b = new lime_expectation_bag(new mock_lime_test());
-  // test
   $b->addExpected(1);
-  try
-  {
-    $b->addActual(2);
-    $t->fail('A "lime_expectation_exception" is thrown');
-  }
-  catch (lime_expectation_exception $e)
-  {
-    $t->pass('A "lime_expectation_exception" is thrown');
-  }
+  $t->expect('lime_expectation_exception');
+  // test
+  $b->addActual(2);
 
 
-$t->comment('Exceptions are thrown if expected values are added too often');
+// @Test: Exceptions are thrown if expected values are added too often
 
   // fixtures
-  $b = new lime_expectation_bag(new mock_lime_test());
-  // test
   $b->addExpected(1);
   $b->addActual(1);
-  try
-  {
-    $b->addActual(1);
-    $t->fail('A "lime_expectation_exception" is thrown');
-  }
-  catch (lime_expectation_exception $e)
-  {
-    $t->pass('A "lime_expectation_exception" is thrown');
-  }
+  $t->expect('lime_expectation_exception');
+  // test
+  $b->addActual(1);
 
 
-$t->comment('setFailOnVerify() suppresses exceptions');
+// @Test: setFailOnVerify() suppresses exceptions
 
-  // fixtures
-  $b = new lime_expectation_bag($mockTest = new mock_lime_test());
   // test
   $b->setFailOnVerify();
   $b->addExpected(1);

@@ -9,7 +9,7 @@
  */
 
 include dirname(__FILE__).'/../../bootstrap/unit.php';
-include dirname(__FILE__).'/../mock_lime_test.class.php';
+require_once dirname(__FILE__).'/../mock_lime_test.class.php';
 
 
 interface TestInterface
@@ -45,10 +45,22 @@ class TestClass
 class TestException extends Exception {}
 
 
-$t = new lime_test(47, new lime_output_color());
+$t = new lime_test_simple(47, new lime_output_color());
 
 
-$t->comment('Interfaces can be mocked');
+// @Before
+
+  $mockTest = new mock_lime_test();
+  $m = lime_mock::create('TestClass', $mockTest);
+
+
+// @After
+
+  $mockTest = null;
+  $m = null;
+
+
+// @Test: Interfaces can be mocked
 
   // test
   $m = lime_mock::create('TestInterface');
@@ -57,7 +69,7 @@ $t->comment('Interfaces can be mocked');
   $t->ok($m instanceof lime_mock_interface, 'The mock implements "lime_mock_interface"');
 
 
-$t->comment('Abstract classes can be mocked');
+// @Test: Abstract classes can be mocked
 
   // test
   $m = lime_mock::create('TestClassAbstract');
@@ -66,7 +78,7 @@ $t->comment('Abstract classes can be mocked');
   $t->ok($m instanceof lime_mock_interface, 'The mock implements "lime_mock_interface"');
 
 
-$t->comment('Non-existing classes can be mocked');
+// @Test: Non-existing classes can be mocked
 
   $m = lime_mock::create('FoobarClass');
   // assertions
@@ -74,7 +86,7 @@ $t->comment('Non-existing classes can be mocked');
   $t->ok($m instanceof lime_mock_interface, 'The mock implements "lime_mock_interface"');
 
 
-$t->comment('Methods with type hints can be mocked');
+// @Test: Methods with type hints can be mocked
 
   // test
   $m = lime_mock::create('TestInterfaceWithTypeHints');
@@ -82,7 +94,7 @@ $t->comment('Methods with type hints can be mocked');
   $t->ok($m instanceof TestInterfaceWithTypeHints, 'The mock implements the interface');
 
 
-$t->comment('Methods with default values can be mocked');
+// @Test: Methods with default values can be mocked
 
   // test
   $m = lime_mock::create('TestInterfaceWithDefaultValues');
@@ -90,7 +102,7 @@ $t->comment('Methods with default values can be mocked');
   $t->ok($m instanceof TestInterfaceWithDefaultValues, 'The mock implements the interface');
 
 
-$t->comment('Methods in the mocked class are not called');
+// @Test: Methods in the mocked class are not called
 
   // fixtures
   TestClass::$calls = 0;
@@ -102,7 +114,7 @@ $t->comment('Methods in the mocked class are not called');
   $t->is(TestClass::$calls, 0, 'The method has not been called');
 
 
-$t->comment('Return values can be stubbed');
+// @Test: Return values can be stubbed
 
   // fixtures
   $m = lime_mock::create('TestClass');
@@ -114,7 +126,7 @@ $t->comment('Return values can be stubbed');
   $t->is($value, 'Foobar', 'The correct value has been returned');
 
 
-$t->comment('Return values can be stubbed based on method parameters');
+// @Test: Return values can be stubbed based on method parameters
 
   // fixtures
   $m = lime_mock::create('TestClass');
@@ -129,44 +141,28 @@ $t->comment('Return values can be stubbed based on method parameters');
   $t->is($value2, 'More foobar', 'The correct value has been returned');
 
 
-$t->comment('Exceptions can be stubbed');
+// @Test: Exceptions can be stubbed
 
   // fixtures
   $m = lime_mock::create('TestClass');
-  // test
   $m->testMethod()->throws('TestException');
   $m->replay();
-  try
-  {
-    $m->testMethod();
-    $t->fail('The exception has been thrown');
-  }
-  catch (TestException $e)
-  {
-    $t->pass('The exception has been thrown');
-  }
+  $t->expect('TestException');
+  // test
+  $m->testMethod();
 
 
-$t->comment('->verify() throws an exception if the mock has been created without a lime_test');
+// @Test: ->verify() throws an exception if the mock has been created without a lime_test
 
   // fixtures
   $m = lime_mock::create('TestClass');
+  $t->expect('BadMethodCallException');
   // test
-  try
-  {
-    $m->verify();
-    $t->fail('A "BadMethodCallException" is thrown');
-  }
-  catch (BadMethodCallException $e)
-  {
-    $t->pass('A "BadMethodCallException" is thrown');
-  }
+  $m->verify();
 
 
-$t->comment('->verify() fails if a method was not called');
+// @Test: ->verify() fails if a method was not called
 
-  // fixtures
-  $m = lime_mock::create('TestClass', $mockTest = new mock_lime_test());
   // test
   $m->testMethod();
   $m->replay();
@@ -176,10 +172,8 @@ $t->comment('->verify() fails if a method was not called');
   $t->is($mockTest->passes, 0, 'No test passed');
 
 
-$t->comment('->verify() passes if a method was called correctly');
+// @Test: ->verify() passes if a method was called correctly
 
-  // fixtures
-  $m = lime_mock::create('TestClass', $mockTest = new mock_lime_test());
   // test
   $m->testMethod(1, 'Foobar');
   $m->replay();
@@ -190,10 +184,8 @@ $t->comment('->verify() passes if a method was called correctly');
   $t->is($mockTest->fails, 0, 'No test failed');
 
 
-$t->comment('->verify() passes if two methods were called correctly');
+// @Test: ->verify() passes if two methods were called correctly
 
-  // fixtures
-  $m = lime_mock::create('TestClass', $mockTest = new mock_lime_test());
   // test
   $m->testMethod1();
   $m->testMethod2('Foobar');
@@ -206,46 +198,28 @@ $t->comment('->verify() passes if two methods were called correctly');
   $t->is($mockTest->fails, 0, 'No test failed');
 
 
-$t->comment('An exception is thrown if a method is called with wrong parameters');
+// @Test: An exception is thrown if a method is called with wrong parameters
 
-  // fixtures
-  $m = lime_mock::create('TestClass', $mockTest = new mock_lime_test());
-  // test
+  // fixture
   $m->testMethod(1, 'Foobar');
   $m->replay();
-  try
-  {
-    $m->testMethod(1);
-    $t->fail('A "lime_expectation_exception" is thrown');
-  }
-  catch (lime_expectation_exception $e)
-  {
-    $t->pass('A "lime_expectation_exception" is thrown');
-  }
-
-
-$t->comment('An exception is thrown if a method is called with the right parameters in a wrong order');
-
-  // fixtures
-  $m = lime_mock::create('TestClass', $mockTest = new mock_lime_test());
+  $t->expect('lime_expectation_exception');
   // test
+  $m->testMethod(1);
+
+
+// @Test: An exception is thrown if a method is called with the right parameters in a wrong order
+
+  // fixture
   $m->testMethod(1, 'Foobar');
   $m->replay();
-  try
-  {
-    $m->testMethod('Foobar', 1);
-    $t->fail('A "lime_expectation_exception" is thrown');
-  }
-  catch (lime_expectation_exception $e)
-  {
-    $t->pass('A "lime_expectation_exception" is thrown');
-  }
+  $t->expect('lime_expectation_exception');
+  // test
+  $m->testMethod('Foobar', 1);
 
 
-$t->comment('setFailOnVerify() suppresses exceptions upon method calls');
+// @Test: setFailOnVerify() suppresses exceptions upon method calls
 
-  // fixtures
-  $m = lime_mock::create('TestClass', $mockTest = new mock_lime_test());
   // test
   $m->setFailOnVerify();
   $m->testMethod(1, 'Foobar');
@@ -257,12 +231,10 @@ $t->comment('setFailOnVerify() suppresses exceptions upon method calls');
   $t->is($mockTest->passes, 0, 'No test passed');
 
 
-$t->comment('A method can be expected twice with different parameters');
+// @Test: A method can be expected twice with different parameters
 
-  $t->comment('  Case 1: Insufficient method calls');
+  // @Test: - Case 1: Insufficient method calls
 
-  // fixtures
-  $m = lime_mock::create('TestClass', $mockTest = new mock_lime_test());
   // test
   $m->testMethod();
   $m->testMethod('Foobar');
@@ -274,10 +246,8 @@ $t->comment('A method can be expected twice with different parameters');
   $t->is($mockTest->fails, 1, 'One test failed');
 
 
-  $t->comment('  Case 2: Sufficient method calls');
+  // @Test: - Case 2: Sufficient method calls
 
-  // fixtures
-  $m = lime_mock::create('TestClass', $mockTest = new mock_lime_test());
   // test
   $m->testMethod();
   $m->testMethod('Foobar');
@@ -290,10 +260,8 @@ $t->comment('A method can be expected twice with different parameters');
   $t->is($mockTest->fails, 0, 'No test failed');
 
 
-$t->comment('Methods may be called in any order');
+// @Test: Methods may be called in any order
 
-  // fixtures
-  $m = lime_mock::create('TestClass', $mockTest = new mock_lime_test());
   // test
   $m->testMethod1();
   $m->testMethod2();
@@ -307,7 +275,7 @@ $t->comment('Methods may be called in any order');
 
 
   /*
-$t->comment('Methods may be called any number of times');
+// @Test: Methods may be called any number of times
 
   // fixtures
   $m = lime_mock::create('TestClass', $mockTest = new mock_lime_test());
@@ -323,10 +291,8 @@ $t->comment('Methods may be called any number of times');
   */
 
 
-$t->comment('By default, method parameters are compared with weak typing');
+// @Test: By default, method parameters are compared with weak typing
 
-  // fixtures
-  $m = lime_mock::create('TestClass', $mockTest = new mock_lime_test());
   // test
   $m->testMethod(1);
   $m->replay();
@@ -337,31 +303,21 @@ $t->comment('By default, method parameters are compared with weak typing');
   $t->is($mockTest->fails, 0, 'No test failed');
 
 
-$t->comment('If you call setStrict(), method parameters are compared with strict typing');
+// @Test: If you call setStrict(), method parameters are compared with strict typing
 
-  $t->comment('  Case 1: Type comparison fails');
+  // @Test: - Case 1: Type comparison fails
 
-  // fixtures
-  $m = lime_mock::create('TestClass', $mockTest = new mock_lime_test());
-  // test
+  // fixture
   $m->setStrict();
   $m->testMethod(1);
   $m->replay();
-  try
-  {
-    $m->testMethod('1');
-    $t->fail('A "lime_expectation_exception" is thrown');
-  }
-  catch (lime_expectation_exception $e)
-  {
-    $t->pass('A "lime_expectation_exception" is thrown');
-  }
+  $t->expect('lime_expectation_exception');
+  // test
+  $m->testMethod('1');
 
 
-  $t->comment('  Case 2: Type comparison passes');
+  // @Test: - Case 2: Type comparison passes
 
-  // fixtures
-  $m = lime_mock::create('TestClass', $mockTest = new mock_lime_test());
   // test
   $m->setStrict();
   $m->testMethod(1);
@@ -373,12 +329,9 @@ $t->comment('If you call setStrict(), method parameters are compared with strict
   $t->is($mockTest->fails, 0, 'No test failed');
 
 
-$t->comment('->times() configures how often a method should be called');
+// @Test: ->times() configures how often a method should be called
 
-  $t->comment('  Case 1: The method is called too seldom');
-
-  // fixtures
-  $m = lime_mock::create('TestClass', $mockTest = new mock_lime_test());
+  // @Test: - Case 1: The method is called too seldom
   // test
   $m->testMethod(1)->times(2);
   $m->replay();
@@ -389,30 +342,20 @@ $t->comment('->times() configures how often a method should be called');
   $t->is($mockTest->fails, 1, 'One test failed');
 
 
-  $t->comment('  Case 2: The method is called too often');
+  // @Test: - Case 2: The method is called too often
 
-  // fixtures
-  $m = lime_mock::create('TestClass', $mockTest = new mock_lime_test());
-  // test
+  // fixture
   $m->testMethod(1)->times(2);
   $m->replay();
   $m->testMethod(1);
   $m->testMethod(1);
-  try
-  {
-    $m->testMethod(1);
-    $t->fail('A "lime_expectation_exception" is thrown');
-  }
-  catch (lime_expectation_exception $e)
-  {
-    $t->pass('A "lime_expectation_exception" is thrown');
-  }
+  $t->expect('lime_expectation_exception');
+  // test
+  $m->testMethod(1);
 
 
-  $t->comment('  Case 3: The number of method calls matches times()');
+  // @Test: - Case 3: The number of method calls matches times()
 
-  // fixtures
-  $m = lime_mock::create('TestClass', $mockTest = new mock_lime_test());
   // test
   $m->testMethod(1)->times(2);
   $m->replay();
@@ -424,29 +367,19 @@ $t->comment('->times() configures how often a method should be called');
   $t->is($mockTest->fails, 0, 'No test failed');
 
 
-  $t->comment('  Case 4: The method is called with different parameters');
+  // @Test: - Case 4: The method is called with different parameters
 
-  // fixtures
-  $m = lime_mock::create('TestClass', $mockTest = new mock_lime_test());
-  // test
+  // fixture
   $m->testMethod(1)->times(2);
   $m->replay();
   $m->testMethod(1);
-  try
-  {
-    $m->testMethod();
-    $t->fail('A "lime_expectation_exception" is thrown');
-  }
-  catch (lime_expectation_exception $e)
-  {
-    $t->pass('A "lime_expectation_exception" is thrown');
-  }
+  $t->expect('lime_expectation_exception');
+  // test
+  $m->testMethod();
 
 
-$t->comment('->times() and ->returns() can be combined');
+// @Test: ->times() and ->returns() can be combined
 
-  // fixtures
-  $m = lime_mock::create('TestClass', $mockTest = new mock_lime_test());
   // test
   $m->testMethod(1)->returns('Foobar')->times(2);
   $m->replay();
@@ -457,7 +390,7 @@ $t->comment('->times() and ->returns() can be combined');
   $t->is($value2, 'Foobar', 'The second return value is correct');
 
 
-$t->comment('The control methods like ->replay() can be mocked');
+// @Test: The control methods like ->replay() can be mocked
 
   // fixtures
   $m = lime_mock::create('TestClass', null, false);
@@ -469,10 +402,8 @@ $t->comment('The control methods like ->replay() can be mocked');
   $t->is($value, 'Foobar', 'The return value was correct');
 
 
-$t->comment('If no method call is expected, all method calls are ignored');
+// @Test: If no method call is expected, all method calls are ignored
 
-  // fixtures
-  $m = lime_mock::create('TestClass', $mockTest = new mock_lime_test());
   // test
   $m->replay();
   $m->testMethod1();
@@ -483,19 +414,11 @@ $t->comment('If no method call is expected, all method calls are ignored');
   $t->is($mockTest->fails, 0, 'No test failed');
 
 
-$t->comment('If setExpectNothing() is called, no method must be called');
+// @Test: If setExpectNothing() is called, no method must be called
 
-  // fixtures
-  $m = lime_mock::create('TestClass', $mockTest = new mock_lime_test());
-  // test
+  // fixture
   $m->setExpectNothing();
   $m->replay();
-  try
-  {
-    $m->testMethod();
-    $t->fail('A "lime_expectation_exception" is thrown');
-  }
-  catch (lime_expectation_exception $e)
-  {
-    $t->pass('A "lime_expectation_exception" is thrown');
-  }
+  $t->expect('lime_expectation_exception');
+  // test
+  $m->testMethod();
