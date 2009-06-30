@@ -175,7 +175,7 @@ class lime_test_simple extends lime_test
     // collect variables
     if (preg_match_all('/\$\w+/', $content, $matches))
     {
-      $this->variables = array_unique(array_merge($this->variables, $matches[0]));
+      $this->variables = array_diff(array_unique(array_merge($this->variables, $matches[0])), array('$this'));
     }
 
     // comment classes, interfaces and functions out
