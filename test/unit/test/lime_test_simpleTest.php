@@ -21,7 +21,7 @@ class Test extends lime_test
 }
 
 
-$t = new Test(19, new lime_output_color());
+$t = new Test(23, new lime_output_color());
 
 // misuse harness to find PHP cli
 $h = new lime_harness(new lime_output_silent());
@@ -33,7 +33,7 @@ function execute($file)
   global $cli;
 
   ob_start();
-  passthru($cli.' '.dirname(__FILE__).'/fixture/'.$file, $result);
+  passthru($cli.' '.dirname(__FILE__).'/fixtures/'.$file, $result);
   $content = ob_get_clean();
 
   return array($result, $content);
@@ -122,6 +122,36 @@ EOF;
   $t->is_output($actual, $expected);
 
 
+$t->comment('Classes can be defined before the annotations');
+
+  // test
+  list($result, $actual) = execute('test_class_before_annotations.php');
+  // assertion
+  $expected = <<<EOF
+1..0
+Test
+ Looks like everything went fine.
+EOF
+;
+  $t->is($result, 0, 'The file returned exit status 0 (success)');
+  $t->is_output($actual, $expected);
+
+
+$t->comment('Functions can be defined before the annotations');
+
+  // test
+  list($result, $actual) = execute('test_function_before_annotations.php');
+  // assertion
+  $expected = <<<EOF
+1..0
+Test
+ Looks like everything went fine.
+EOF
+;
+  $t->is($result, 0, 'The file returned exit status 0 (success)');
+  $t->is_output($actual, $expected);
+
+
 $t->comment('Unknown annotations result in exceptions');
 
   // test
@@ -198,6 +228,3 @@ EOF
 )).'/';
   $t->is($result, 0, 'The file returned exit status 0 (success)');
   $t->is_output($actual, $expected, 'like');
-
-
-

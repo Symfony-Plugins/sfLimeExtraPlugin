@@ -168,19 +168,29 @@ class lime_test_simple extends lime_test
    */
   protected function parse()
   {
-    $lines = file($this->backupPath);
+    $content = file_get_contents($this->backupPath);
     $file = fopen($this->path, 'w');
     $inFunctionBlock = false;
 
     // collect variables
-    if (preg_match_all('/\$\w+/', implode($lines), $matches))
+    if (preg_match_all('/\$\w+/', $content, $matches))
     {
       $this->variables = array_unique(array_merge($this->variables, $matches[0]));
     }
 
-    // process lines
-    foreach ($lines as $line)
+    // replace classes and functions
+    if (preg_match_all('/(class\s\w+\s*|function\s+\w+\s*\([^)]*\)\s*)?\{([^{}]*|(?R))*\}/si', $content, $matches))
     {
+      foreach ($matches[0] as $block)
+      {
+        $content = str_replace($block, '/*'.$block.'*/', $content);
+      }
+    }
+
+    // process lines
+    foreach (explode("\n", $content) as $line)
+    {
+      // annotation
       if (preg_match('/^\s*\/\/\s*@(\w+)([:\s]+(.*))?\s*$/', $line, $matches))
       {
         $unknownAnnotation = false;
@@ -225,8 +235,8 @@ class lime_test_simple extends lime_test
         {
           $line .= ' '.$this->testVariable.'->comment("'.$data.'");';
         }
-        $line .= "\n";
       }
+      // tester instantiation
       else if (strpos($line, 'new lime_test_simple') !== false)
       {
         // register tester
@@ -243,10 +253,10 @@ class lime_test_simple extends lime_test
         {
           $variables[$key] .= ' = null';
         }
-        $line = 'global '.implode(', ', $this->variables).'; '.$this->testVariable." = \$this;\n";
+        $line = 'global '.implode(', ', $this->variables).'; '.$this->testVariable." = \$this;";
       }
 
-      fwrite($file, $line);
+      fwrite($file, $line."\n");
     }
 
     if ($inFunctionBlock)
