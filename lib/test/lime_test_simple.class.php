@@ -179,7 +179,7 @@ class lime_test_simple extends lime_test
     }
 
     // replace classes and functions
-    if (preg_match_all('/(class\s\w+\s*|function\s+\w+\s*\([^)]*\)\s*)?\{([^{}]*|(?R))*\}/si', $content, $matches))
+    if (preg_match_all('/(((abstract\s+)?class|interface)\s\w+\s*|function\s+\w+\s*\([^)]*\)\s*)?\{([^{}]*|(?R))*\}/si', $content, $matches))
     {
       foreach ($matches[0] as $block)
       {
