@@ -24,6 +24,10 @@ interface TestInterfaceDefinition {}
 
 abstract class TestAbstractClassDefinition {}
 
+class TestExtendingClassDefinition extends TestClassDefinition implements TestInterfaceDefinition {}
+
+class TestImplementingClassDefinition implements TestInterfaceDefinition {}
+
 $t = new lime_test_simple(0);
 
 // @Test
