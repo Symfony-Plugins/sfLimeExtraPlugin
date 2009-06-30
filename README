@@ -1,6 +1,10 @@
 Creating Stubs and Mocks with sfLimeExtraPlugin
 ===============================================
 
+**Note:** The readme currently does not explain the possibilities of
+annotated tests. For more information about that, I recommend to read my
+[blog post over at Web Mozarts](http://webmozarts.com/2009/06/30/easy-unit-testing/).
+
 Stubs and mock objects can simulate the behaviour of real classes. They are
 useful for testing code that depends on third classes (the "dependent-on 
 component"). For the purpose of the test it is mostly sufficient though to 
@@ -10,8 +14,8 @@ executing the real class's code.
 sfLimeExtraPlugin provides a light-weight and intuitive mocking framework for
 use with **lime**.
 
-**Attention: This plugin is still in its alpha stages and subject to change.
-I would be happy if you want to try it out to give me feedback.**
+**Attention:** This plugin is still in its alpha stages and subject to change.
+I would be happy if you want to try it out to give me feedback.
 
 
 Installation
