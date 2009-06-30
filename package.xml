@@ -13,11 +13,11 @@
 		<email>bschussek@gmail.com</email>
 		<active>yes</active>
 	</lead>
-	<date>2009-06-28</date>
-	<time>03:12:00</time>
+	<date>2009-06-30</date>
+	<time>22:19:00</time>
 	<version>
-		<release>0.2.0</release>
-		<api>0.2.0</api>
+		<release>0.2.1</release>
+		<api>0.2.1</api>
 	</version>
 	<stability>
 		<release>alpha</release>
@@ -77,10 +77,13 @@
 							<file role="data" name="test_after.php" />
 							<file role="data" name="test_before_all.php" />
 							<file role="data" name="test_before.php" />
+							<file role="data" name="test_class_before_annotations.php" />
 							<file role="data" name="test_code_before_annotations.php" />
 							<file role="data" name="test_comments.php" />
 							<file role="data" name="test_expect.php" />
+							<file role="data" name="test_function_before_annotations.php" />
 							<file role="data" name="test_ignore_unknown.php" />
+							<file role="data" name="test_multline_comments.php" />
 							<file role="data" name="test_scope_before.php" />
 							<file role="data" name="test_scope_global.php" />
 						</dir>
@@ -134,6 +137,24 @@
 			<license uri="http://www.symfony-project.org/license">MIT license</license>
 			<date>2009-06-28</date>
 			<notes>Added support for annotated test scripts. See the inline documentation of class lime_test_simple for details.</notes>
+		</release>
+		<release>
+			<version>
+				<release>0.2.1</release>
+				<api>0.2.1</api>
+			</version>
+			<stability>
+				<release>alpha</release>
+				<api>alpha</api>
+			</stability>
+			<license uri="http://www.symfony-project.org/license">MIT license</license>
+			<date>2009-06-30</date>
+			<notes>
+      * Fixed: Annotated test files can now contain abstract class and interface definitions 
+      * Fixed: Annotated tests can be commented out with /*...*/ 
+      * Improved: Changed existing tests to use lime_test_simple
+      * Improved: lime_test_simple::getScriptPath() now relies on the back traces
+      </notes>
 		</release>
 	</changelog>
 </package>
