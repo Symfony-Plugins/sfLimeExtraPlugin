@@ -140,7 +140,7 @@ class lime_mock
    * A template for overridden abstract methods in base classes/interfaces.
    * @var string
    */
-  protected static $methodTemplate = '%s function %s(%s) { $args = func_get_args(); return $this->__call(%s, $args); }';
+  protected static $methodTemplate = '%s function %s(%s) { $args = func_get_args(); return $this->__call(\'%s\', $args); }';
 
   protected static $parameterTemplate = '%s %s';
 
@@ -215,7 +215,7 @@ class lime_mock
         }
 
         $methods .= sprintf(self::$methodTemplate, $modifiers, $method->getName(),
-            implode(', ', $parameters), $method->getName());
+            implode(', ', $parameters), $method->getName())."\n  ";
       }
     }
 
@@ -246,6 +246,11 @@ class lime_mock
 
     $template = new lime_mock_template(dirname(__FILE__).'/template/mocked_class.tpl');
 
+    var_dump($template->render(array(
+      'class_declaration'   =>  $declaration,
+      'methods'             =>  $methods,
+      'generate_methods'    =>  $generateMethods,
+    )));
     eval($template->render(array(
       'class_declaration'   =>  $declaration,
       'methods'             =>  $methods,
