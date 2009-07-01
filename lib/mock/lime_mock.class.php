@@ -176,40 +176,47 @@ class lime_mock
     $class = new ReflectionClass($classOrInterface);
     foreach ($class->getMethods() as $method)
     {
-      /* @var $method ReflectionMethod */
-      $modifiers = Reflection::getModifierNames($method->getModifiers());
-      $modifiers = array_diff($modifiers, array('abstract'));
-      $modifiers = implode(' ', $modifiers);
-
-      $parameters = array();
-
-      foreach ($method->getParameters() as $parameter)
+      if (!in_array($method->getName(), array('__construct', '__call', '__lime_getControl')))
       {
-        /* @var $parameter ReflectionParameter */
-        if ($parameter->getClass())
+        /* @var $method ReflectionMethod */
+        $modifiers = Reflection::getModifierNames($method->getModifiers());
+        $modifiers = array_diff($modifiers, array('abstract'));
+        $modifiers = implode(' ', $modifiers);
+  
+        $parameters = array();
+  
+        foreach ($method->getParameters() as $parameter)
         {
-          $typeHint = $parameter->getClass()->getName();
-        }
-        else if ($parameter->isArray())
-        {
-          $typeHint = 'array';
+          /* @var $parameter ReflectionParameter */
+          if ($parameter->getClass())
+          {
+            $typeHint = $parameter->getClass()->getName();
+          }
+          else if ($parameter->isArray())
+          {
+            $typeHint = 'array';
+          }
+          else
+          {
+            $typeHint = '';
+          }
+  
+          $name = '$'.$parameter->getName();
+  
+          if ($parameter->isOptional())
+          {
+            $default = var_export($parameter->getDefaultValue(), true);
+            $parameters[] = sprintf(self::$parameterWithDefaultTemplate, $typeHint, $name, $default);
+          }
+          else
+          {
+            $parameters[] = sprintf(self::$parameterTemplate, $typeHint, $name);
+          }
         }
 
-        $name = '$'.$parameter->getName();
-
-        if ($parameter->isOptional())
-        {
-          $default = var_export($parameter->getDefaultValue(), true);
-          $parameters[] = sprintf(self::$parameterWithDefaultTemplate, $typeHint, $name, $default);
-        }
-        else
-        {
-          $parameters[] = sprintf(self::$parameterTemplate, $typeHint, $name);
-        }
+        $methods .= sprintf(self::$methodTemplate, $modifiers, $method->getName(),
+            implode(', ', $parameters), $method->getName());
       }
-
-      $methods .= sprintf(self::$methodTemplate, $modifiers, $method->getName(),
-          implode(', ', $parameters), $method->getName());
     }
 
     $interfaces = array();

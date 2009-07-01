@@ -32,6 +32,16 @@ abstract class TestClassAbstract
   abstract public function testMethod($parameter);
 }
 
+class TestClassWithConstructor
+{
+  public static $calls = 0;
+  
+  public function __construct()
+  {
+    self::$calls++;
+  }
+}
+
 class TestClass
 {
   public static $calls = 0;
@@ -45,7 +55,7 @@ class TestClass
 class TestException extends Exception {}
 
 
-$t = new lime_test_simple(47, new lime_output_color());
+$t = new lime_test_simple(50, new lime_output_color());
 
 
 // @Before
@@ -84,6 +94,15 @@ $t = new lime_test_simple(47, new lime_output_color());
   // assertions
   $t->ok($m instanceof FoobarClass, 'The mock generates and inherits the class');
   $t->ok($m instanceof lime_mock_interface, 'The mock implements "lime_mock_interface"');
+  
+  
+// @Test: Classes with constructors can be mocked
+
+  $m = lime_mocK::create('TestClassWithConstructor');
+  // assertions
+  $t->ok($m instanceof TestClassWithConstructor, 'The mock generates and inherits the class');
+  $t->ok($m instanceof lime_mock_interface, 'The mock implements "lime_mock_interface"');
+  $t->is(TestClassWithConstructor::$calls, 0, 'The original constructor was not called');
 
 
 // @Test: Methods with type hints can be mocked
