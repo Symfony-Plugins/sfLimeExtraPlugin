@@ -173,7 +173,7 @@ abstract class lime_expectation_collection implements lime_verifiable
     $ignoreValue = count($this->expected) == 0 && !$this->expectNothing;
     if (!$this->failOnVerify && !$ignoreValue && !$this->isExpected($value))
     {
-      throw new lime_expectation_exception('Unexpected value "'.$value.'"');
+      throw new lime_expectation_exception('Unexpected value "'.var_export($value, true).'"');
     }
 
     $this->actual[] = $value;
