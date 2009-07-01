@@ -246,11 +246,6 @@ class lime_mock
 
     $template = new lime_mock_template(dirname(__FILE__).'/template/mocked_class.tpl');
 
-    var_dump($template->render(array(
-      'class_declaration'   =>  $declaration,
-      'methods'             =>  $methods,
-      'generate_methods'    =>  $generateMethods,
-    )));
     eval($template->render(array(
       'class_declaration'   =>  $declaration,
       'methods'             =>  $methods,
